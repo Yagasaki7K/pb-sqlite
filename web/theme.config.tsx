@@ -1,6 +1,4 @@
-import type { DocsThemeConfig } from 'nextra-theme-docs';
-
-const config: DocsThemeConfig = {
+const config = {
   logo: <span>🐻‍❄️ pbdb</span>,
   project: { link: 'https://github.com/yagasaki/pbdb' },
   docsRepositoryBase: 'https://github.com/yagasaki/pbdb/tree/main/web',
