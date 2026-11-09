@@ -14,7 +14,7 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
     <html lang="en" suppressHydrationWarning>
       <body>
         <Layout pageMap={pageMap}>
-          <Navbar pageMap={pageMap} logo={<strong>🐻‍❄️ pbdb</strong>} />
+          <Navbar logo={<strong>🐻‍❄️ pbdb</strong>} />
           {children}
           <Footer>pbdb — Polar Bear Database</Footer>
         </Layout>
