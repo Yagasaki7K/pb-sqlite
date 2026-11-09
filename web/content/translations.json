@@ -4,11 +4,19 @@
     { "code": "pt-BR", "label": "Português (Brasil)", "status": "complete" }
   ],
   "pages": [
-    { "path": "/docs/getting-started", "en": { "status": "complete", "updated": "2026-11-09" }, "pt-BR": { "status": "complete", "updated": "2026-11-09" } },
+    { "path": "/docs/getting-started", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } },
+    { "path": "/docs/concepts", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } },
+    { "path": "/docs/use-cases", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } },
     { "path": "/docs/api", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } },
-    { "path": "/docs/security/report", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } },
+    { "path": "/docs/react", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } },
+    { "path": "/docs/nextjs", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } },
+    { "path": "/docs/storage", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } },
+    { "path": "/docs/multi-tab", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } },
     { "path": "/docs/migrations", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } },
-    { "path": "/docs/export", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } }
+    { "path": "/docs/export", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } },
+    { "path": "/docs/troubleshooting", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } },
+    { "path": "/docs/faq", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } },
+    { "path": "/docs/security/report", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } }
   ],
   "uiStrings": [
     { "key": "nav.docs", "en": "Docs", "pt-BR": "Documentação" },

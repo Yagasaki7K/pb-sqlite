@@ -1,0 +1,21 @@
+---
+title: Conceitos e arquitetura
+---
+
+# Conceitos e arquitetura
+
+## Persistência em OPFS
+
+O arquivo SQLite fica no Origin Private File System do navegador. Ele é privado da origem e sobrevive a recarregamentos e reinícios do navegador, respeitando quotas e políticas de armazenamento.
+
+## Worker isolado
+
+Os comandos SQLite rodam em um Web Worker. A interface envia mensagens assíncronas e não precisa bloquear a renderização.
+
+## Bancos nomeados
+
+`createDB('nome')` associa um nome a um banco local. Trate o nome como um identificador estável; para trocar de nome, use exportação e importação.
+
+## Sem rede implícita
+
+O pb-sqlite não faz requisições, sincroniza com servidor nem resolve conflitos. A aplicação decide sua política de sincronização.

@@ -1,0 +1,11 @@
+---
+title: Coordenação entre abas
+---
+
+# Coordenação entre abas
+
+Abas com o mesmo nome de banco podem trabalhar juntas sem escrever o arquivo SQLite independentemente.
+
+A primeira aba torna-se líder e possui o Worker. As outras encaminham requisições pelo BroadcastChannel. Web Locks evita dois líderes simultâneos; se o líder fechar, uma aba seguidora é promovida.
+
+Isso não é sincronização entre dispositivos nem resolução de conflitos de negócio. Essa política pertence à sua aplicação.

@@ -1,0 +1,26 @@
+---
+title: Next.js integration
+---
+
+# Next.js integration
+
+pb-sqlite runs on the client. Keep database creation and queries in Client Components.
+
+```tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+import { createDB } from 'pb-sqlite';
+
+export function LocalStatus() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    let db: Awaited<ReturnType<typeof createDB>> | undefined;
+    void createDB('next-app').then((opened) => { db = opened; setReady(true); });
+    return () => { void db?.close(); };
+  }, []);
+  return <p>{ready ? 'Local database ready' : 'Opening local database…'}</p>;
+}
+```
+
+Do not import a database instance into a Server Component, Route Handler, or build-time function. The server can render the shell, but OPFS is initialized only after the browser loads the Client Component.

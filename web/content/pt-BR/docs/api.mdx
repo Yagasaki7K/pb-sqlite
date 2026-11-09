@@ -4,4 +4,43 @@ title: Referência da API
 
 # Referência da API
 
-A API fornece criação de banco, consultas, transações, migrações, importação, exportação, invalidação e fechamento.
+## `createDB(nome, opções?)`
+
+Abre um banco no navegador e retorna um `PbdbDatabase`.
+
+```ts
+const db = await createDB('catalogo', {
+  storage: 'opfs',
+  debug: false,
+  onError: (error) => console.error(error),
+});
+```
+
+## SQL
+
+```ts
+await db.run('UPDATE produtos SET estoque = estoque - ? WHERE id = ?', [1, productId]);
+const produtos = await db.query<Produto>('SELECT * FROM produtos WHERE estoque > ?', [0]);
+const produto = await db.getOne<Produto>('SELECT * FROM produtos WHERE id = ?', [productId]);
+```
+
+`run` executa comandos sem resultado de linhas. `query` retorna `T[]`; `getOne` retorna `T | null`.
+
+## Transações
+
+```ts
+await db.transaction(async (tx) => {
+  await tx.run('INSERT INTO pedidos (id) VALUES (?)', [orderId]);
+  await tx.run('INSERT INTO itens_pedido (pedido_id, sku) VALUES (?, ?)', [orderId, sku]);
+});
+```
+
+A transação confirma quando o callback termina e desfaz as alterações quando ele lança um erro.
+
+## Ciclo de vida e dados
+
+- `isReady`, `close()` e `onTableChange(listener)` controlam ciclo de vida e observação.
+- `migrate` e `rollback` controlam mudanças de schema.
+- `export` / `import` usam um payload portátil.
+- `exportSQLite` / `importSQLite` usam uma imagem SQLite nativa.
+- `invalidate` / `invalidateAll` notificam consumidores reativos.

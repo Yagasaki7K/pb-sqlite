@@ -2,4 +2,23 @@
 title: Export and import
 ---
 
-Use `exportSQLite()` for a native SQLite binary and `importSQLite()` to restore it. Use `export()` and `import()` when you need the portable JSON payload format.
+# Export and import
+
+## Portable payload
+
+```ts
+const payload = await db.export();
+await db.import(payload);
+```
+
+The payload contains a version, schema version, creation timestamp, and bytes. Preserve the metadata and bytes together. For large backups, use a file or IndexedDB rather than localStorage.
+
+## Native SQLite image
+
+```ts
+const image = await db.exportSQLite();
+const file = new File([image], 'backup.sqlite', { type: 'application/vnd.sqlite3' });
+await db.importSQLite(image);
+```
+
+Use the native image when another SQLite tool needs the database. Validate file origin and size before importing untrusted data.

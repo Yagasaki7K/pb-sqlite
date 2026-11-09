@@ -2,4 +2,20 @@
 title: Exportação e importação
 ---
 
-Use `exportSQLite()` para obter um binário SQLite nativo e `importSQLite()` para restaurá-lo. Use `export()` e `import()` quando precisar do payload JSON portátil.
+# Exportação e importação
+
+Use o payload portátil para backups controlados pela aplicação:
+
+```ts
+const payload = await db.export();
+await db.import(payload);
+```
+
+Use uma imagem SQLite nativa quando outra ferramenta precisar abrir o banco:
+
+```ts
+const image = await db.exportSQLite();
+await db.importSQLite(image);
+```
+
+Valide tamanho e origem de arquivos importados. Um backup não é uma fronteira de autorização.

@@ -1,5 +1,5 @@
 {
-  "name": "pbdb-docs",
+  "name": "pb-sqlite-docs",
   "private": true,
   "scripts": {
     "dev": "next dev",

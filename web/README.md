@@ -1,4 +1,11 @@
-# pbdb documentation
+# pb-sqlite documentation
+
+The documentation site is a Next.js/Nextra MDX app. English is the default language and the complete Portuguese translation is available under `/pt-BR`.
+
+```bash
+bun run dev
+bun run build
+```
 
 The docs site uses the Nextra 4 App Router and official docs theme. Run `bun install`, then `bun run --cwd web dev` or `bun run --cwd web build`.
 

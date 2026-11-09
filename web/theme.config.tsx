@@ -1,14 +1,14 @@
 const config = {
-  logo: <span>🐻‍❄️ pbdb</span>,
-  project: { link: 'https://github.com/yagasaki/pbdb' },
-  docsRepositoryBase: 'https://github.com/yagasaki/pbdb/tree/main/web',
+  logo: <span>❄️ pb-sqlite</span>,
+  project: { link: 'https://github.com/Yagasaki7K/pb-sqlite' },
+  docsRepositoryBase: 'https://github.com/Yagasaki7K/pb-sqlite/tree/main/web',
   i18n: [
     { locale: 'en', name: 'English' },
     { locale: 'pt-BR', name: 'Português (Brasil)' },
   ],
-  footer: { text: 'pbdb — Polar Bear Database' },
+  footer: { text: 'pb-sqlite — browser-first SQLite' },
   useNextSeoProps() {
-    return { titleTemplate: '%s – pbdb' };
+    return { titleTemplate: '%s – pb-sqlite' };
   },
 };
 

@@ -1,10 +1,33 @@
 ---
-title: pbdb
-description: Browser SQLite for offline-first applications.
+title: pb-sqlite
+description: Local-first SQLite for browser applications.
 ---
 
-# SQLite, local-first.
+# SQLite for the browser
 
-Browser SQLite with OPFS persistence, worker threading, React hooks, and safe multi-tab coordination.
+Build offline-first applications with a real SQLite database that stays in the browser.
 
-[Get started](/docs/getting-started)
+<div className="hero-grid">
+  <div><strong>Local-first</strong><span>Data is available before the network is.</span></div>
+  <div><strong>Worker-backed</strong><span>SQLite work stays away from the UI thread.</span></div>
+  <div><strong>Multi-tab safe</strong><span>Tabs coordinate through Web Locks and BroadcastChannel.</span></div>
+</div>
+
+## Start in two minutes
+
+```bash
+bun install pb-sqlite
+```
+
+```ts
+import { createDB } from 'pb-sqlite';
+
+const db = await createDB('my-app');
+await db.run('CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, body TEXT)');
+```
+
+[Read the getting started guide](/docs/getting-started) or browse the topics in the sidebar.
+
+## What pb-sqlite is for
+
+Use it when an application needs fast local reads, offline writes, private data, or a SQLite-compatible model without making every interaction wait for a server. Synchronization with a backend remains an application concern.

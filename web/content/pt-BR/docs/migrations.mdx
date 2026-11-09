@@ -1,5 +1,23 @@
 ---
-title: Migrações
+title: Migrations
 ---
 
-As migrações são ordenadas, explícitas e verificadas por checksum. Alterar uma migração já aplicada gera `MigrationChecksumMismatchError`.
+# Migrations
+
+Migrations tornam alterações de schema explícitas e verificáveis.
+
+```ts
+import type { Migration } from 'pb-sqlite';
+
+const migrations: Migration[] = [{
+  version: 1,
+  name: 'criar notas',
+  up: 'CREATE TABLE notes (id INTEGER PRIMARY KEY, body TEXT NOT NULL)',
+  down: 'DROP TABLE notes',
+  checksum: '',
+}];
+
+await db.migrate(migrations);
+```
+
+As migrations são ordenadas e registradas em `_pbdb_migrations`. Depois de aplicada, não edite uma migration: crie uma nova versão. `rollback` executa o SQL `down` em ordem reversa.

@@ -1,0 +1,27 @@
+---
+title: Segurança
+description: Limites de segurança e divulgação responsável do pb-sqlite.
+---
+
+# Segurança
+
+O `pb-sqlite` foi projetado para dados locais no navegador. Ele não envia o banco para um servidor por conta própria, mas a aplicação que o utiliza continua responsável por controle de acesso, exportações e qualquer camada de sincronização.
+
+## Modelo de segurança
+
+- Os arquivos do OPFS são isolados pela origem do navegador.
+- A execução SQL acontece em um Web Worker dedicado.
+- A biblioteca não oferece autenticação, criptografia em repouso ou replicação remota.
+- Um banco exportado ou backup deve ser tratado como dado sensível.
+- Migrations e schema devem ser confiáveis; não concatene SQL com entrada não confiável.
+
+## Como reportar uma vulnerabilidade
+
+Não publique detalhes de exploração em uma issue. Envie um relato privado aos mantenedores com a versão afetada, passos para reproduzir, impacto e uma prova de conceito mínima. Aguarde tempo para a correção antes da divulgação pública.
+
+## Checklist da aplicação
+
+1. Valide entradas usando parâmetros SQL.
+2. Restrinja quem pode executar exportação, reset e migrations.
+3. Teste em navegação privada e após a limpeza do armazenamento.
+4. Mantenha dependências e o bundle do worker atualizados.

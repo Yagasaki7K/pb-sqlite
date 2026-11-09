@@ -1,0 +1,24 @@
+---
+title: Integração com Next.js
+---
+
+# Integração com Next.js
+
+O pb-sqlite roda no cliente. Use `'use client'` e inicialize o banco em um componente ou effect.
+
+```tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+import { createDB } from 'pb-sqlite';
+
+export function StatusLocal() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    void createDB('next-app').then((db) => { setReady(true); void db.close(); });
+  }, []);
+  return <p>{ready ? 'Banco local pronto' : 'Abrindo banco local…'}</p>;
+}
+```
+
+Não crie banco em Server Components, Route Handlers ou durante o build.

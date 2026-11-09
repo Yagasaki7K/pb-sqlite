@@ -1,0 +1,25 @@
+---
+title: Perguntas frequentes
+---
+
+# Perguntas frequentes
+
+## O pb-sqlite envia dados para um servidor?
+
+Não. Ele não possui cliente de rede nem sincronização automática.
+
+## Os dados sobrevivem ao reload?
+
+Sim, quando OPFS está disponível e a origem é a mesma. Quotas e políticas do navegador continuam valendo.
+
+## Posso usar em duas abas?
+
+Sim. Use o mesmo nome de banco; uma aba lidera e as outras encaminham requisições.
+
+## Posso usar em Node.js?
+
+O runtime foi projetado para navegadores e depende de storage e Worker do browser.
+
+## Ele substitui um backend?
+
+Não. Ele é a camada local, não uma API, sistema de autorização ou sincronização entre dispositivos.

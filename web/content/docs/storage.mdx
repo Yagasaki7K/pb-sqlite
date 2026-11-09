@@ -1,0 +1,19 @@
+---
+title: Storage and browser support
+---
+
+# Storage and browser support
+
+pb-sqlite needs a browser with OPFS, Web Workers, and modern typed-array APIs. Web Locks enables the preferred multi-tab election; BroadcastChannel carries coordination and change messages.
+
+```ts
+import { getStorageEstimate, isStoragePersisted, requestPersistence } from 'pb-sqlite';
+
+await requestPersistence();
+const persisted = await isStoragePersisted();
+const { usage, quota } = await getStorageEstimate();
+```
+
+Persistence requests are best-effort. A quota estimate is not a guarantee. Handle `OPFSUnavailableError` and provide a recovery or unsupported-browser screen.
+
+Data remains local unless your application reads it and sends it elsewhere. Browser storage is not a substitute for encryption, authentication, or secure device handling.

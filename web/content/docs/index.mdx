@@ -1,10 +1,20 @@
 ---
 title: Documentation
-description: Browser SQLite for offline-first applications.
+description: Learn how to build with pb-sqlite.
 ---
 
-# pbdb
+# Documentation
 
-SQLite in the browser with OPFS persistence, worker isolation, React hooks, and safe multi-tab coordination.
+pb-sqlite is a browser-only SQLite runtime for local-first web applications.
 
-Use the sidebar to start with installation and the typed API.
+Start with [Getting started](/docs/getting-started), then learn the [architecture](/docs/concepts), choose a [use case](/docs/use-cases), or jump to the [API reference](/docs/api).
+
+## The mental model
+
+```text
+UI -> pb-sqlite API -> Worker -> SQLite file in OPFS
+             ^             |
+             +-- tab coordination --+
+```
+
+The package never uploads data, chooses a server, or invents a synchronization protocol for you.

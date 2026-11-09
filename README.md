@@ -1,245 +1,102 @@
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/1b1a0d0c-483c-40fc-a60e-4003430d5231"/>
-</p>
+# pb-sqlite
 
-# pbdb (Polarbear Database)
+SQLite local-first para aplicações web. O `pb-sqlite` mantém dados no navegador usando OPFS, executa SQLite em Web Worker e coordena múltiplas abas sem depender de um servidor.
 
-> Browser SQLite for offline-first applications, with OPFS persistence, worker threading, React hooks, and safe multi-tab coordination.
+> O projeto ainda está em preparação para a primeira publicação pública no npm. A API documentada é a API atual do repositório.
 
-**Initial commit has a fork of [lona-q](https://github.com/Lona-up/lona-q)**
+## Por que pb-sqlite?
 
-## Features
+- **Offline-first:** leituras e escritas continuam funcionando sem conexão.
+- **SQLite real:** SQL, índices, joins e transações no navegador.
+- **Persistência local:** os dados ficam no OPFS e não são enviados automaticamente para uma API.
+- **Worker isolado:** o processamento SQLite não bloqueia a interface.
+- **Múltiplas abas:** Web Locks e BroadcastChannel coordenam líder, seguidores e mudanças.
+- **Backups:** exporte o payload do banco ou um arquivo SQLite nativo.
+- **React opcional:** use `pb-sqlite/react` apenas quando seu app usar React.
 
-- **Just `bun add`** — Zero configuration required
-- **Data persists after closing the browser** — Saved to OPFS (Origin Private File System)
-- **Data stays in the browser** — Never sent to a server (privacy-first)
-- **Real SQLite** — Full support for JOINs, transactions, and indexes
-- **React hooks** — Reactive data binding with `useQuery`
-- **Multi-tab support** — Safe data sharing via leader election pattern
-- **Export / Import** — Back up and restore your data anytime
-
-## Quick Start
-
-### Install
+## Instalação
 
 ```bash
-bun add pbdb
+bun install pb-sqlite
+# ou
+npm install pb-sqlite
 ```
 
-### Vanilla JS
+## Primeiros passos
 
-```typescript
-import { createDB } from "pbdb";
+```ts
+import { createDB } from 'pb-sqlite';
 
-const db = await createDB("myapp");
+const db = await createDB('tasks');
 
 await db.run(`
-  CREATE TABLE IF NOT EXISTS todos (
+  CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    text TEXT NOT NULL,
-    completed INTEGER DEFAULT 0
+    title TEXT NOT NULL,
+    done INTEGER NOT NULL DEFAULT 0
   )
 `);
 
-await db.run("INSERT INTO todos (text) VALUES (?)", ["Buy milk"]);
+await db.run('INSERT INTO tasks (title) VALUES (?)', ['Read the docs']);
+const tasks = await db.query<{ id: number; title: string; done: number }>(
+  'SELECT * FROM tasks ORDER BY id DESC'
+);
 
-const todos = await db.query("SELECT * FROM todos");
-console.log(todos); // [{ id: 1, text: 'Buy milk', completed: 0 }]
+await db.close();
 ```
 
-### React
+## React
 
 ```tsx
-import { LonaQProvider, useLonaQ, useQuery } from "pbdb/react";
-import type { Migration } from "pbdb";
+'use client';
 
-const migrations: Migration[] = [
-  {
-    version: 1,
-    up: `CREATE TABLE todos (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      text TEXT NOT NULL,
-      completed INTEGER DEFAULT 0
-    )`,
-  },
-];
+import { PbdbProvider, useQuery } from 'pb-sqlite/react';
 
-function App() {
+export function App() {
   return (
-    <LonaQProvider dbName="myapp" migrations={migrations}>
-      <TodoList />
-    </LonaQProvider>
+    <PbdbProvider dbName="tasks" fallback={<p>Opening database…</p>}>
+      <TaskList />
+    </PbdbProvider>
   );
 }
 
-function TodoList() {
-  const db = useLonaQ();
-  const { data: todos } = useQuery<{
-    id: number;
-    text: string;
-    completed: number;
-  }>("SELECT * FROM todos ORDER BY id DESC");
-
-  const addTodo = async (text: string) => {
-    await db.run("INSERT INTO todos (text) VALUES (?)", [text]);
-    // useQuery automatically refetches — no manual refresh needed
-  };
-
-  return (
-    <ul>
-      {todos.map((todo) => (
-        <li key={todo.id}>{todo.text}</li>
-      ))}
-    </ul>
+function TaskList() {
+  const { data, isLoading } = useQuery<{ id: number; title: string }>(
+    'SELECT id, title FROM tasks ORDER BY id DESC'
   );
+  if (isLoading) return <p>Loading…</p>;
+  return <pre>{JSON.stringify(data, null, 2)}</pre>;
 }
 ```
 
-## API Reference
+## Documentação
 
-### `createDB(dbName, options?)`
+Leia a documentação completa em [`web/content/docs`](./web/content/docs) ou execute o site localmente:
 
-Creates and connects to a database.
-
-```typescript
-const db = await createDB("myapp");
+```bash
+bun install
+bun run dev
 ```
 
-### `db.run(sql, params?)`
+Depois abra `http://localhost:3000/`.
 
-Executes INSERT, UPDATE, DELETE, CREATE TABLE, etc.
+## Desenvolvimento e publicação
 
-```typescript
-await db.run("INSERT INTO users (name) VALUES (?)", ["Alice"]);
+```bash
+bun run build
+bun run test
+bun run lint
+bun run typecheck
 ```
 
-### `db.query<T>(sql, params?)`
+O pacote publicado inclui `dist`, `README.md` e `LICENSE`. Antes do primeiro `npm publish`, confira a versão, o changelog e os artefatos gerados em `packages/pbdb/dist`.
 
-Executes a SELECT query and returns an array of results.
+## Limites importantes
 
-```typescript
-const users = await db.query<{ id: number; name: string }>(
-  "SELECT * FROM users",
-);
-```
+`pb-sqlite` é browser-only: `createDB` precisa de `navigator.storage`, OPFS, Web Worker e, quando disponível, Web Locks. Não inicialize o banco em Server Components ou no processo Node; encapsule a integração em código cliente.
 
-### `db.getOne<T>(sql, params?)`
+Veja a [documentação completa](./web/content/docs/index.mdx) para arquitetura, API, migrations, React, export/import, suporte de navegador, troubleshooting e FAQ.
 
-Returns the first row, or `null` if none found.
+## Licença
 
-```typescript
-const user = await db.getOne("SELECT * FROM users WHERE id = ?", [1]);
-```
-
-### `db.transaction(fn)`
-
-Executes a transaction. Automatically rolls back on error.
-
-```typescript
-await db.transaction(async (tx) => {
-  await tx.run(
-    "UPDATE accounts SET balance = balance - ? WHERE id = ?",
-    [100, 1],
-  );
-  await tx.run(
-    "UPDATE accounts SET balance = balance + ? WHERE id = ?",
-    [100, 2],
-  );
-});
-```
-
-### `db.export()` / `db.import(data)`
-
-Export / import the database in JSON format.
-
-```typescript
-const data = await db.export();
-// Save data somewhere...
-
-// Restore on another environment
-await db.import(data);
-```
-
-### `db.close()`
-
-Closes the database and releases resources.
-
-## React Hooks
-
-### `<PbqbProvider>`
-
-Place at the root of your app.
-
-```tsx
-<PbqbProvider
-  dbName="myapp"
-  migrations={[{ version: 1, up: "CREATE TABLE ..." }]}
-  fallback={<p>Loading...</p>}
->
-  {children}
-</PbqbProvider>
-```
-
-### `usePBQB()`
-
-Get the database instance (for mutations).
-
-### `useQuery<T>(sql, params?)`
-
-Reactive SELECT query. Automatically refetches when data changes.
-
-```typescript
-const { data, isLoading, error, refetch } = useQuery<Todo>(
-  "SELECT * FROM todos WHERE completed = ?",
-  [0],
-);
-```
-
-## Multi-Tab Support
-
-Polarbear supports multiple tabs via a leader election pattern.
-
-- The first tab to open becomes the **leader** and directly operates SQLite
-- Subsequent tabs become **followers** and execute queries through the leader
-- When the leader is closed, a follower is automatically promoted to the new leader
-- Table changes are broadcast to all tabs in real time
-
-No special configuration needed — just call `createDB()` and it works.
-
-## Deploying to Vercel / Next.js
-
-No special configuration required. Just `bun run build` and deploy to Vercel.
-
-**Note**: Polarbear runs on the client side only. It cannot be used in Server Components. The `'use client'` directive is required.
-
-## FAQ
-
-**Q: Will my data disappear when I close the browser?**
-A: No. Data is persisted in OPFS and survives browser restarts.
-
-**Q: Can I share data across browsers or devices?**
-A: You can use export/import to transfer data between environments.
-
-**Q: How much data can I store?**
-A: It depends on the browser's storage quota (typically tens of percent of disk space).
-
-**Q: Can I use this with Next.js SSR?**
-A: Client-side only. The `'use client'` directive is required.
-
-**Q: What happens if I open multiple tabs?**
-A: Polarbear uses a leader election pattern to handle this safely. No data conflicts will occur.
-
-## Browser Support
-
-- Chrome 102+
-- Firefox 111+
-- Safari 17+
-- Edge 102+
-
-## Acknowledgments
-
-Polarbear is built on [wa-sqlite](https://github.com/rhashimoto/wa-sqlite) by Roy T. Hashimoto (MIT License) — a WebAssembly build of SQLite.
-
-## License
-
-MIT
+MIT.

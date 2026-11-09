@@ -16,7 +16,7 @@
       "name": "pbdb-example-nextjs",
       "dependencies": {
         "next": "^14.2.21",
-        "pbdb": "workspace:*",
+        "pb-sqlite": "workspace:*",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
       },
@@ -37,7 +37,7 @@
       },
     },
     "packages/pbdb": {
-      "name": "pbdb",
+      "name": "pb-sqlite",
       "version": "0.2.0",
       "dependencies": {
         "wa-sqlite": "^1.0.0",
@@ -59,7 +59,7 @@
       ],
     },
     "web": {
-      "name": "pbdb-docs",
+      "name": "pb-sqlite-docs",
       "dependencies": {
         "next": "^15.5.7",
         "nextra": "^4.6.1",
@@ -1604,9 +1604,9 @@
 
     "pathval": ["pathval@2.0.1", "", {}, "sha512-//nshmD55c46FuFw26xV/xFAaB5HF9Xdap7HJBBnrKdAd6/GxDBaNA1870O79+9ueg61cZLSVc+OaFlfmObYVQ=="],
 
-    "pbdb": ["pbdb@workspace:packages/pbdb"],
+    "pb-sqlite": ["pb-sqlite@workspace:packages/pbdb"],
 
-    "pbdb-docs": ["pbdb-docs@workspace:web"],
+    "pb-sqlite-docs": ["pb-sqlite-docs@workspace:web"],
 
     "pbdb-example-nextjs": ["pbdb-example-nextjs@workspace:examples/nextjs-app-router"],
 

@@ -1,0 +1,25 @@
+---
+title: Troubleshooting
+---
+
+# Troubleshooting
+
+## `OPFSUnavailableError`
+
+The browser or context does not expose the required storage API. Check secure context, browser support, privacy settings, and embedded webview restrictions.
+
+## `PbdbNotReadyError`
+
+The database method was called before `createDB` completed. Await initialization, use the provider fallback, or gate actions on `isReady`.
+
+## `PbdbTimeoutError`
+
+The Worker or leader did not answer in time. Check suspended tabs, resource pressure, long SQL, and multi-tab lifecycle. Retry idempotent operations only.
+
+## Data seems missing
+
+Confirm the origin, protocol, database name, and browser profile. `localhost`, a preview URL, and production are separate storage origins. A changed name points to a new store.
+
+## Migration checksum mismatch
+
+Do not edit an applied migration. Restore the original SQL or create a new version. Test both a fresh database and an upgrade path.

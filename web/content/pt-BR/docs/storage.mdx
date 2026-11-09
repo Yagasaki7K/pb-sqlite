@@ -1,0 +1,17 @@
+---
+title: Armazenamento e navegadores
+---
+
+# Armazenamento e navegadores
+
+O pb-sqlite precisa de OPFS, Web Workers e APIs modernas do navegador. Web Locks é usado para eleger o líder entre abas; BroadcastChannel transporta coordenação e notificações.
+
+```ts
+import { getStorageEstimate, isStoragePersisted, requestPersistence } from 'pb-sqlite';
+
+await requestPersistence();
+const persisted = await isStoragePersisted();
+const { usage, quota } = await getStorageEstimate();
+```
+
+Essas APIs são best-effort. Trate `OPFSUnavailableError`, quotas e modos privados como estados possíveis da aplicação.

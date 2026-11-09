@@ -1,0 +1,29 @@
+---
+title: FAQ
+---
+
+# FAQ
+
+## Does pb-sqlite send data to a server?
+
+No. It has no network client and does not sync automatically.
+
+## Does data survive a reload?
+
+Yes, when OPFS is available and the origin remains the same. Quotas and browser policies still apply.
+
+## Can two tabs use one database?
+
+Yes. Use the same database name; one tab leads and followers forward requests.
+
+## Can I use it in Node.js?
+
+The runtime is designed for browsers and requires browser storage and Worker APIs.
+
+## Does it replace a backend?
+
+No. It is the local database layer, not an API, authorization system, or cross-device sync service.
+
+## Can I use arbitrary SQL?
+
+Normal SQLite statements supported by the underlying build are available. Keep queries parameterized and test the features your target version needs.

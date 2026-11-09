@@ -1,0 +1,42 @@
+---
+title: React integration
+---
+
+# React integration
+
+The React entry point is optional. Import from `pb-sqlite/react`.
+
+## Provider
+
+```tsx
+'use client';
+
+import { PbdbProvider } from 'pb-sqlite/react';
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <PbdbProvider dbName="my-app" fallback={<p>Opening local database…</p>}>
+      {children}
+    </PbdbProvider>
+  );
+}
+```
+
+The provider opens the database once, runs supplied migrations, exposes it through context, and closes it when unmounted.
+
+## `usePbdb` and `useQuery`
+
+```tsx
+const db = usePbdb();
+await db.run('INSERT INTO notes (body) VALUES (?)', [body]);
+
+const { data, isLoading, error, refetch } = useQuery<Note>(
+  'SELECT id, body FROM notes ORDER BY id DESC'
+);
+```
+
+Queries refetch after relevant table changes. Use `refetch()` or a tag invalidation when a domain change cannot be inferred from SQL.
+
+## Next.js rules
+
+Put the provider and hook users behind `'use client'`. Do not create a database in a Server Component or during static generation.

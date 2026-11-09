@@ -2,13 +2,44 @@
 title: Primeiros passos
 ---
 
+# Primeiros passos
+
+## Instalação
+
 ```bash
-bun add pbdb
+bun install pb-sqlite
+# npm install pb-sqlite também funciona
 ```
 
-```typescript
-import { createDB } from 'pbdb';
+## Criar um banco
 
-const db = await createDB('farmacia');
-await db.run('CREATE TABLE IF NOT EXISTS vendas (id INTEGER PRIMARY KEY)');
+```ts
+import { createDB } from 'pb-sqlite';
+
+const db = await createDB('tarefas');
+await db.run(`CREATE TABLE IF NOT EXISTS tarefas (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  titulo TEXT NOT NULL,
+  concluida INTEGER NOT NULL DEFAULT 0
+)`);
+await db.run('INSERT INTO tarefas (titulo) VALUES (?)', ['Ler a documentação']);
 ```
+
+O nome identifica o banco local. O mesmo nome em outra aba aponta para o mesmo banco.
+
+## Consultar dados
+
+```ts
+type Tarefa = { id: number; titulo: string; concluida: number };
+
+const tarefas = await db.query<Tarefa>(
+  'SELECT * FROM tarefas WHERE concluida = ? ORDER BY id DESC', [0]
+);
+const primeira = await db.getOne<Tarefa>('SELECT * FROM tarefas WHERE id = ?', [1]);
+```
+
+`query` retorna uma lista; `getOne` retorna a primeira linha ou `null`. Use parâmetros SQL para dados fornecidos pelo usuário.
+
+## Limite do navegador
+
+`createDB` precisa de OPFS e Web Worker. Em Next.js, execute-o em um Client Component ou dentro de um effect, nunca durante o build ou em Server Components.

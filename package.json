@@ -1,5 +1,5 @@
 {
-  "name": "pbdb",
+  "name": "pb-sqlite-workspace",
   "private": true,
   "version": "0.2.0",
   "description": "Polar Bear Database workspace",
@@ -13,13 +13,13 @@
     "web"
   ],
   "scripts": {
-    "build": "bun run --filter pbdb build && bun run --cwd web build",
+    "build": "bun run --filter pb-sqlite build && bun run --cwd web build",
     "dev": "bun run --cwd web dev",
-    "dev:lib": "bun run --filter pbdb dev",
-    "test": "bun run --filter pbdb test",
-    "test:e2e": "bun run --filter pbdb test:e2e",
-    "lint": "bun run --filter pbdb lint",
-    "typecheck": "bun run --filter pbdb typecheck",
+    "dev:lib": "bun run --filter pb-sqlite dev",
+    "test": "bun run --filter pb-sqlite test",
+    "test:e2e": "bun run --filter pb-sqlite test:e2e",
+    "lint": "bun run --filter pb-sqlite lint",
+    "typecheck": "bun run --filter pb-sqlite typecheck",
     "format": "bunx prettier --write .",
     "changeset": "bunx changeset",
     "ci": "bun run typecheck && bun run lint && bun run test && bun run build"

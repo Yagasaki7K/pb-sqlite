@@ -1,0 +1,25 @@
+---
+title: Use cases
+---
+
+# Use cases
+
+## Offline forms and field work
+
+Save drafts, inspections, checklists, and notes locally first. Queue your own sync messages and upload them when connectivity returns.
+
+## Private client-side data
+
+Use a local database for preferences, personal workspaces, sensitive drafts, and caches that should not be sent to a server by default. Add encryption when your threat model requires it; OPFS alone is not encryption.
+
+## Fast search and dashboards
+
+Import a dataset once, create SQLite indexes, and query locally. This works well for catalogs, inventory, documentation search, and analytics snapshots.
+
+## Installable web apps
+
+Pair pb-sqlite with a service worker and an app shell. The service worker handles assets; pb-sqlite handles structured data.
+
+## When not to use it
+
+Do not use pb-sqlite as a server database, cross-device database by itself, or replacement for authorization. It is a browser storage engine and needs application-level sync and security when data leaves the device.

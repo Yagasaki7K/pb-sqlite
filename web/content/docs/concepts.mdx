@@ -1,0 +1,25 @@
+---
+title: Concepts and architecture
+---
+
+# Concepts and architecture
+
+## OPFS persistence
+
+The database file is stored in the browser's Origin Private File System. It is private to the origin and survives page reloads and browser restarts. Browser quotas still apply, so important data should have an export path.
+
+## Worker isolation
+
+SQLite commands run in a Web Worker. The main thread sends typed messages and receives results asynchronously, keeping parsing and queries away from rendering.
+
+## Named databases
+
+`createDB('name')` maps an application-level name to a local database. Treat names as stable identifiers. Renaming creates a different local store; export/import moves data between names.
+
+## No implicit network
+
+pb-sqlite does not sync to a server, make HTTP requests, or resolve conflicts. That separation keeps local state private and lets your application choose its sync policy.
+
+## Change notifications
+
+Writes produce table-change notifications. React's `useQuery` refetches queries whose tables overlap; vanilla applications can subscribe with `onTableChange`.

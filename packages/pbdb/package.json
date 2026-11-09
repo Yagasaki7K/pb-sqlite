@@ -1,5 +1,5 @@
 {
-  "name": "pbdb",
+  "name": "pb-sqlite",
   "version": "0.2.0",
   "description": "Browser SQLite with OPFS, Web Workers, React hooks, and safe multi-tab coordination.",
   "license": "MIT",
@@ -14,10 +14,10 @@
     "./worker": { "import": "./dist/worker.js" }
   },
   "sideEffects": false,
-  "repository": { "type": "git", "url": "https://github.com/yagasaki/pbdb" },
+  "repository": { "type": "git", "url": "https://github.com/Yagasaki7K/pb-sqlite" },
   "homepage": "https://pbdb.dev",
-  "author": "pbdb contributors; forked from lona-q contributors",
-  "contributors": ["pbdb contributors", "lona-q contributors"],
+  "author": "pb-sqlite contributors; forked from lona-q contributors",
+  "contributors": ["pb-sqlite contributors", "lona-q contributors"],
   "engines": { "node": ">=18" },
   "scripts": {
     "build": "tsup",

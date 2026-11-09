@@ -3,3 +3,30 @@ title: Report a vulnerability
 ---
 
 Report security issues privately through the project maintainers or GitHub Security Advisories. Include affected versions, impact, and a minimal reproduction.
+---
+title: Security
+description: Security boundaries and responsible disclosure for pb-sqlite.
+---
+
+# Security
+
+`pb-sqlite` is designed for local browser data. It does not send database contents to a server by itself, but the application that embeds it remains responsible for access control, export handling, and any synchronization layer.
+
+## Security model
+
+- OPFS files are scoped to the browser origin.
+- SQL execution happens inside a dedicated Web Worker.
+- The library does not provide authentication, encryption at rest, or remote replication.
+- Treat an exported database or backup as sensitive application data.
+- Keep schema and migration definitions trusted; do not build SQL by concatenating untrusted input.
+
+## Reporting a vulnerability
+
+Do not publish exploit details in an issue. Send a private report to the repository maintainers with the affected version, reproduction steps, impact, and a minimal proof of concept. Allow time for a fix before public disclosure.
+
+## Application checklist
+
+1. Validate user input with SQL parameters.
+2. Restrict who can trigger export, reset, and migration operations.
+3. Test behavior in private browsing and after storage eviction.
+4. Keep dependencies and the generated worker bundle up to date.

@@ -1,8 +1,16 @@
 ---
 title: Documentação
-description: SQLite no navegador para aplicações offline-first.
+description: Aprenda a construir com pb-sqlite.
 ---
 
-# pbdb
+# Documentação
 
-SQLite no navegador com persistência em OPFS, isolamento em worker, hooks React e coordenação segura entre abas.
+O pb-sqlite é um runtime SQLite para aplicações web local-first. Os dados ficam no navegador, os comandos rodam em um Web Worker e abas diferentes coordenam o acesso ao mesmo banco.
+
+Comece por [Primeiros passos](/pt-BR/docs/getting-started), leia a [arquitetura](/pt-BR/docs/concepts), explore [casos de uso](/pt-BR/docs/use-cases) ou consulte a [referência da API](/pt-BR/docs/api).
+
+```text
+UI -> API pb-sqlite -> Worker -> SQLite no OPFS
+             ^             |
+             +-- coordenação entre abas --+
+```

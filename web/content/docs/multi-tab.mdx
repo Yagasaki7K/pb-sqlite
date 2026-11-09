@@ -1,0 +1,11 @@
+---
+title: Multi-tab coordination
+---
+
+# Multi-tab coordination
+
+Opening the same database name in multiple tabs is supported without each tab writing the SQLite file independently.
+
+The first tab becomes leader and owns the active Worker. Other tabs become followers and forward requests through BroadcastChannel. Web Locks prevents two tabs from claiming leadership at the same time. If the leader closes, a follower is promoted and opens the Worker.
+
+Use a stable name, keep methods asynchronous, subscribe to `onTableChange`, and handle timeouts or leader-election errors with retry UI. Multi-tab coordination is not cross-device synchronization and does not resolve business conflicts between offline edits.
