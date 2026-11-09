@@ -6,6 +6,7 @@ on:
 
 jobs:
   release:
+    if: ${{ hashFiles('.changeset/*.md') != '' }}
     name: Changesets release
     runs-on: ubuntu-latest
     steps:
