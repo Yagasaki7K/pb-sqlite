@@ -6,7 +6,9 @@ const mdxComponentsPath = path.join(process.cwd(), 'app', 'mdx-components.tsx');
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  i18n: { locales: ['en', 'pt-BR'], defaultLocale: 'en' },
+  // Locale folders are handled by Nextra's content loader. Keeping Next.js'
+  // Pages Router i18n disabled avoids mixing it with the App Router catch-all.
+  i18n: undefined,
   turbopack: {
     resolveAlias: {
       'next-mdx-import-source-file': './app/mdx-components.tsx',
