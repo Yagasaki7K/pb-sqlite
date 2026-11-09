@@ -3,7 +3,7 @@ import './globals.css';
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'pb-sqlite — browser-first SQLite',
+  title: 'Polarbear Database — browser-first SQLite',
   description: 'Browser SQLite for offline-first applications.',
 };
 

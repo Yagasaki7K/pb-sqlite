@@ -4,9 +4,18 @@ body { margin: 0; background: radial-gradient(circle at top, #102a43, var(--bg) 
 a { color: var(--accent); text-decoration: none; }
 .docs-header { max-width: 1280px; margin: 0 auto; padding: 1.1rem 1.5rem; display: flex; gap: 1.5rem; align-items: center; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
 .top-nav { display: flex; gap: 1.25rem; align-items: center; }
-.language-switch { display: flex; gap: .25rem; margin-left: auto; padding: .25rem; border: 1px solid var(--line); border-radius: .65rem; }
-.language-switch a { padding: .35rem .55rem; color: var(--muted); border-radius: .4rem; font-size: .85rem; }
-.language-switch a.active, .language-switch a:hover { background: #17324a; color: var(--text); }
+.language-menu { position: relative; margin-left: auto; }
+.language-menu summary { list-style: none; cursor: pointer; padding: .45rem .6rem; border: 1px solid var(--line); border-radius: .55rem; color: var(--text); font-size: 1.1rem; }
+.language-menu summary::-webkit-details-marker { display: none; }
+.language-menu:hover summary, .language-menu[open] summary { background: #17324a; }
+.language-options { position: absolute; z-index: 10; right: 0; top: calc(100% + .4rem); min-width: 8.5rem; padding: .35rem; background: #0b1b2d; border: 1px solid var(--line); border-radius: .65rem; box-shadow: 0 .75rem 2rem rgb(0 0 0 / 30%); }
+.language-menu:not([open]) .language-options { display: none; }
+.language-menu:hover .language-options, .language-menu[open] .language-options { display: grid; }
+.language-options a { padding: .5rem .6rem; color: var(--muted); border-radius: .4rem; font-size: .85rem; }
+.language-options a.active, .language-options a:hover { background: #17324a; color: var(--text); }
+.github-link { display: inline-flex; color: var(--text); padding: .45rem; border-radius: .55rem; }
+.github-link svg { width: 1.35rem; height: 1.35rem; }
+.github-link:hover { background: #17324a; color: var(--accent); }
 .brand { font-weight: 800; color: var(--text); margin-right: auto; }
 .docs-layout { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: calc(100vh - 150px); }
 .docs-sidebar { padding: 3rem 1rem 3rem 1.5rem; border-right: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
@@ -16,8 +25,11 @@ a { color: var(--accent); text-decoration: none; }
 .docs-sidebar a:hover, .docs-sidebar a.active { color: var(--text); background: #122a42; }
 .docs-content { min-width: 0; max-width: 900px; padding: 3.5rem clamp(1.5rem, 5vw, 5rem); }
 .docs-content main { padding: 0; max-width: none; }
-.docs-footer { max-width: 1280px; margin: 0 auto; padding: 1.5rem; border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent); color: var(--muted); font-size: .85rem; }
+.docs-footer { max-width: 1280px; margin: 0 auto; padding: 1.5rem; border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent); color: #c5d8e8; font-size: .85rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .hero { text-align: center; padding: 5rem 0; } h1 { font-size: clamp(3rem, 8vw, 6rem); margin: 0 0 1rem; letter-spacing: -.06em; } h2 { margin-top: 3rem; }
+.docs-content h1, .docs-content h2, .docs-content h3, .docs-content h4, .docs-content h5, .docs-content h6 { color: #ffffff; }
+.docs-content h1 { text-shadow: 0 1px 18px rgb(0 0 0 / 20%); }
+.docs-content strong { color: #f6fbff; }
 .muted { color: var(--muted); font-size: 1.15rem; } .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
 .card { background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid #25445d; border-radius: 1rem; padding: 1.25rem; } code, pre { font-family: ui-monospace, SFMono-Regular, monospace; } pre { overflow: auto; padding: 1rem; border-radius: .75rem; background: #020812; }
 @media (max-width: 800px) { .docs-header { flex-wrap: wrap; } .top-nav { order: 3; width: 100%; } .docs-layout { display: block; } .docs-sidebar { padding: 1rem 1.5rem; border-right: 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); overflow-x: auto; } .docs-sidebar nav { display: flex; gap: .25rem; width: max-content; } .docs-content { padding-top: 2rem; } }
