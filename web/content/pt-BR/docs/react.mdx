@@ -7,13 +7,13 @@ title: Integração com React
 ```tsx
 'use client';
 
-import { PbdbProvider, useQuery } from 'pb-sqlite/react';
+import { PbSqliteProvider, useQuery } from 'pb-sqlite/react';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <PbdbProvider dbName="minha-app" fallback={<p>Abrindo banco local…</p>}>
+    <PbSqliteProvider dbName="minha-app" fallback={<p>Abrindo banco local…</p>}>
       {children}
-    </PbdbProvider>
+    </PbSqliteProvider>
   );
 }
 
@@ -25,4 +25,4 @@ function Lista() {
 }
 ```
 
-`PbdbProvider` abre o banco, executa migrations e fecha a conexão ao desmontar. `usePbdb` acessa a instância e `useQuery` refaz consultas quando tabelas relevantes mudam.
+`PbSqliteProvider` abre o banco, executa migrations e fecha a conexão ao desmontar. `usePbSqlite` acessa a instância e `useQuery` refaz consultas quando tabelas relevantes mudam.

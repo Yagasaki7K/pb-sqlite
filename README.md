@@ -6,7 +6,7 @@
 
 Local-first SQLite for web applications. `pb-sqlite` keeps data in the browser using OPFS, runs SQLite in a Web Worker, and coordinates multiple tabs without relying on a server.
 
-> The project is still being prepared for its first public npm release. The documented API reflects the current state of the repository.
+> The repository is prepared for its first public npm release as `1.0.0`. The documented API reflects the current state of the repository.
 
 ## Why pb-sqlite?
 
@@ -33,7 +33,7 @@ import { createDB } from "pb-sqlite";
 
 const db = await createDB("tasks");
 
-await db.run(`
+await db.exec(`
   CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,

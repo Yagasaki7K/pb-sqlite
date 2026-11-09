@@ -11,23 +11,23 @@ The React entry point is optional. Import from `pb-sqlite/react`.
 ```tsx
 'use client';
 
-import { PbdbProvider } from 'pb-sqlite/react';
+import { PbSqliteProvider } from 'pb-sqlite/react';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <PbdbProvider dbName="my-app" fallback={<p>Opening local database…</p>}>
+    <PbSqliteProvider dbName="my-app" fallback={<p>Opening local database…</p>}>
       {children}
-    </PbdbProvider>
+    </PbSqliteProvider>
   );
 }
 ```
 
 The provider opens the database once, runs supplied migrations, exposes it through context, and closes it when unmounted.
 
-## `usePbdb` and `useQuery`
+## `usePbSqlite` and `useQuery`
 
 ```tsx
-const db = usePbdb();
+const db = usePbSqlite();
 await db.run('INSERT INTO notes (body) VALUES (?)', [body]);
 
 const { data, isLoading, error, refetch } = useQuery<Note>(

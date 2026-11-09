@@ -11,5 +11,6 @@ export default defineConfig({
   splitting: false,
   sourcemap: false,
   clean: true,
-  external: ['react', 'wa-sqlite'],
+  external: ['react'],
+  noExternal: ['wa-sqlite'],
 });

@@ -5,7 +5,7 @@ title: Solução de problemas
 # Solução de problemas
 
 - **`OPFSUnavailableError`:** o contexto não fornece OPFS; verifique navegador, origem segura e modo de privacidade.
-- **`PbdbNotReadyError`:** aguarde `createDB` ou use o fallback do provider.
-- **`PbdbTimeoutError`:** verifique abas suspensas, SQL demorado e eleição de líder; repita apenas operações idempotentes.
+- **`PbSqliteNotReadyError`:** aguarde `createDB` ou use o fallback do provider.
+- **`PbSqliteTimeoutError`:** verifique abas suspensas, SQL demorado e eleição de líder; repita apenas operações idempotentes.
 - **Dados ausentes:** confira origem, perfil, protocolo e nome do banco. Preview e produção têm storages diferentes.
 - **Checksum incompatível:** não edite migration aplicada; restaure o SQL original ou crie uma nova versão.

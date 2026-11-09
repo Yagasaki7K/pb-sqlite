@@ -52,6 +52,7 @@ export function electLeader(
       channel.postMessage({ type: 'leader-closing', leaderId: tabId } satisfies LeaderMessage);
     };
     window.addEventListener('beforeunload', unloadHandler);
+    window.addEventListener('pagehide', unloadHandler);
 
     return transport;
   }
@@ -115,6 +116,7 @@ export function electLeader(
       if (watchdogTimer) clearTimeout(watchdogTimer);
       if (followerListener) channel.removeEventListener('message', followerListener);
       if (unloadHandler) window.removeEventListener('beforeunload', unloadHandler);
+      if (unloadHandler) window.removeEventListener('pagehide', unloadHandler);
       channel.close();
     };
   }

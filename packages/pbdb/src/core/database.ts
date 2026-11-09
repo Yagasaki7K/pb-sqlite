@@ -69,6 +69,7 @@ class PbSqliteDatabaseImpl implements PbSqliteDatabase {
   /** リーダー昇格時にトランスポートを差し替える */
   _replaceTransport(transport: Transport) {
     this.transport = transport;
+    this._isReady = false;
     this.wireTransport(transport);
   }
 
@@ -210,7 +211,10 @@ export async function createDB(
       new Worker(new URL('./worker.js', import.meta.url), { type: 'module' })
     );
     db = new PbSqliteDatabaseImpl(transport, options.queryTimeout ?? DEFAULT_QUERY_TIMEOUT, options);
-    onTransportChange((nextTransport) => db._replaceTransport(nextTransport));
+    onTransportChange((nextTransport) => {
+      db._replaceTransport(nextTransport);
+      void db.send({ type: 'init', dbName }).then(() => db._markReady()).catch((error: unknown) => options.onError?.(error instanceof Error ? error : new Error(String(error))));
+    });
   } else {
     // フォールバック: シングルタブモード（Web Locks 非対応環境）
     const worker = new Worker(

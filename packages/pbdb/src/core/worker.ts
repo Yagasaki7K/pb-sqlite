@@ -8,6 +8,7 @@ type SQLParams = (number | string | Uint8Array | number[] | bigint | null)[];
 
 let sqlite3: ReturnType<typeof SQLite.Factory>;
 let db: number | undefined;
+let activeVfs: AccessHandlePoolVFS | undefined;
 let activeDbName = '';
 
 function extractMutatedTables(sql: string): string[] {
@@ -69,6 +70,7 @@ async function initDB(dbName: string) {
   sqlite3 = SQLite.Factory(module);
 
   const vfs = new AccessHandlePoolVFS(dirPath);
+  activeVfs = vfs;
   await vfs.isReady;
 
   // プールに空きスロットがなければ拡張（ジャーナル/一時ファイル用に4つ確保）
@@ -143,6 +145,8 @@ async function handleSQLiteExport(): Promise<Uint8Array> {
 async function handleSQLiteImport(data: Uint8Array): Promise<void> {
   if (db === undefined) throw new Error('Database is not initialized');
   await sqlite3.close(db);
+  await activeVfs?.close();
+  activeVfs = undefined;
   db = undefined;
   await clearOPFSDirectory(`/pbsqlite/${activeDbName}`);
   const root = await navigator.storage.getDirectory();
@@ -248,6 +252,9 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
 
       case 'close': {
         await sqlite3.close(db as number);
+        await activeVfs?.close();
+        activeVfs = undefined;
+        db = undefined;
         respond({ id, type: 'success' });
         break;
       }

@@ -8,11 +8,11 @@ title: Troubleshooting
 
 The browser or context does not expose the required storage API. Check secure context, browser support, privacy settings, and embedded webview restrictions.
 
-## `PbdbNotReadyError`
+## `PbSqliteNotReadyError`
 
 The database method was called before `createDB` completed. Await initialization, use the provider fallback, or gate actions on `isReady`.
 
-## `PbdbTimeoutError`
+## `PbSqliteTimeoutError`
 
 The Worker or leader did not answer in time. Check suspended tabs, resource pressure, long SQL, and multi-tab lifecycle. Retry idempotent operations only.
 

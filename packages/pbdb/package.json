@@ -1,6 +1,6 @@
 {
   "name": "pb-sqlite",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Browser SQLite with OPFS, Web Workers, React hooks, and safe multi-tab coordination.",
   "license": "MIT",
   "type": "module",
@@ -20,7 +20,7 @@
   "contributors": ["pb-sqlite contributors", "lona-q contributors"],
   "engines": { "node": ">=18" },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && bun scripts/copy-wasm.ts",
     "dev": "tsup --watch",
     "test": "vitest run --coverage",
     "test:e2e": "playwright test",
