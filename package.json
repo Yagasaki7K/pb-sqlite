@@ -14,7 +14,8 @@
   ],
   "scripts": {
     "build": "bun run --filter pbdb build && bun run --cwd web build",
-    "dev": "bun run --filter pbdb dev",
+    "dev": "bun run --cwd web dev",
+    "dev:lib": "bun run --filter pbdb dev",
     "test": "bun run --filter pbdb test",
     "test:e2e": "bun run --filter pbdb test:e2e",
     "lint": "bun run --filter pbdb lint",

@@ -1,5 +1,4 @@
 import { generateStaticParamsFor, importPage } from 'nextra/pages';
-import { useMDXComponents as getMDXComponents } from '../mdx-components';
 import type { ReactElement } from 'react';
 import { notFound } from 'next/navigation';
 
@@ -22,12 +21,10 @@ export default async function Page({ params }: { params: Promise<{ mdxPath?: str
   const resolvedParams = await params;
   const result = await loadPage(resolvedParams.mdxPath ?? []);
   if (!result) notFound();
-  const { default: MDXContent, toc, metadata, sourceCode } = result;
-  const Wrapper = getMDXComponents().wrapper;
-  if (!Wrapper) notFound();
+  const { default: MDXContent } = result;
   return (
-    <Wrapper toc={toc} metadata={metadata} sourceCode={sourceCode}>
+    <main>
       <MDXContent params={resolvedParams} />
-    </Wrapper>
+    </main>
   );
 }
