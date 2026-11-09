@@ -1,0 +1,44 @@
+{
+  "name": "pbdb",
+  "version": "0.2.0",
+  "description": "Browser SQLite with OPFS, Web Workers, React hooks, and safe multi-tab coordination.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "README.md", "LICENSE"],
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js", "require": "./dist/index.cjs" },
+    "./react": { "types": "./dist/react.d.ts", "import": "./dist/react.js", "require": "./dist/react.cjs" },
+    "./worker": { "import": "./dist/worker.js" }
+  },
+  "sideEffects": false,
+  "repository": { "type": "git", "url": "https://github.com/yagasaki/pbdb" },
+  "homepage": "https://pbdb.dev",
+  "author": "pbdb contributors; forked from lona-q contributors",
+  "contributors": ["pbdb contributors", "lona-q contributors"],
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "lint": "eslint src tests",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "changeset": "changeset"
+  },
+  "dependencies": { "wa-sqlite": "^1.0.0" },
+  "peerDependencies": { "react": ">=18.0.0" },
+  "peerDependenciesMeta": { "react": { "optional": true } },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/react": "^18.3.18",
+    "react": "^18.3.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8",
+    "@vitest/coverage-v8": "^2.1.8"
+  }
+}

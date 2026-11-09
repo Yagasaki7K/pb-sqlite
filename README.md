@@ -1,7 +1,8 @@
-# lona-q
+# pbdb (Polar Bear Database)
 
-> Zero-config browser SQLite for Vercel & Next.js.
-> No server. No external DB. Just `npm install` and go.
+> Browser SQLite for offline-first applications, with OPFS persistence, worker threading, React hooks, and safe multi-tab coordination.
+
+**Fork of [lona-q](https://github.com/Lona-up/lona-q) — professionalized fork with worker threading, robust migrations, Web Locks multi-tab, and i18n docs.**
 
 ## Features
 
@@ -18,13 +19,13 @@
 ### Install
 
 ```bash
-npm install @lona-up/lona-q
+npm install pbdb
 ```
 
 ### Vanilla JS
 
 ```typescript
-import { createDB } from '@lona-up/lona-q';
+import { createDB } from 'pbdb';
 
 const db = await createDB('myapp');
 

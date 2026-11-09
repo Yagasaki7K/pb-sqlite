@@ -1,5 +1,11 @@
 node_modules/
 dist/
-CLAUDE.md
-package-lock.json
-example/
+.next/
+*.log
+.env*
+coverage/
+.turbo/
+playwright-report/
+test-results/
+.DS_Store
+node_modules/wa-sqlite/

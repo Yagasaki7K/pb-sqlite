@@ -1,0 +1,2 @@
+import translations from '../../content/translations.json';
+export default function Translate() { return <main><h1>Translation status</h1><div className="grid">{translations.locales.map((locale) => <article className="card" key={locale.code}><h2>{locale.label}</h2><p>{locale.status === 'complete' ? '✅ Complete' : '🟡 In progress'}</p></article>)}</div><h2>Pages</h2>{translations.pages.map((page) => <p key={page.path}><code>{page.path}</code> — EN: {page.en.status}, PT-BR: {page['pt-BR'].status}</p>)}</main>; }

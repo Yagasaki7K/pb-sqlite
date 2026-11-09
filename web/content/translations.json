@@ -1,0 +1,15 @@
+{
+  "locales": [
+    { "code": "en", "label": "English", "status": "complete" },
+    { "code": "pt-BR", "label": "Português (Brasil)", "status": "complete" }
+  ],
+  "pages": [
+    { "path": "/docs/getting-started", "en": { "status": "complete", "updated": "2026-11-09" }, "pt-BR": { "status": "complete", "updated": "2026-11-09" } },
+    { "path": "/docs/api", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } },
+    { "path": "/docs/security/report", "en": { "status": "complete" }, "pt-BR": { "status": "complete" } }
+  ],
+  "uiStrings": [
+    { "key": "nav.docs", "en": "Docs", "pt-BR": "Documentação" },
+    { "key": "nav.examples", "en": "Examples", "pt-BR": "Exemplos" }
+  ]
+}

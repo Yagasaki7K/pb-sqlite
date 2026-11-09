@@ -1,0 +1,11 @@
+:root { color-scheme: dark; --bg: #07111f; --panel: #0d1d31; --text: #e5f3ff; --muted: #9cb4c9; --accent: #7dd3fc; }
+* { box-sizing: border-box; }
+body { margin: 0; background: radial-gradient(circle at top, #102a43, var(--bg) 52%); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+a { color: var(--accent); text-decoration: none; }
+main { max-width: 1100px; margin: 0 auto; padding: 5rem 1.5rem; }
+nav { max-width: 1100px; margin: 0 auto; padding: 1.25rem 1.5rem; display: flex; gap: 1.25rem; align-items: center; }
+.brand { font-weight: 800; color: var(--text); margin-right: auto; }
+.hero { text-align: center; padding: 5rem 0; } h1 { font-size: clamp(3rem, 8vw, 6rem); margin: 0 0 1rem; letter-spacing: -.06em; } h2 { margin-top: 3rem; }
+.muted { color: var(--muted); font-size: 1.15rem; } .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.card { background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid #25445d; border-radius: 1rem; padding: 1.25rem; } code, pre { font-family: ui-monospace, SFMono-Regular, monospace; } pre { overflow: auto; padding: 1rem; border-radius: .75rem; background: #020812; }
+@media (max-width: 700px) { .grid { grid-template-columns: 1fr; } main { padding-top: 2rem; } }

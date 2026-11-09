@@ -1,0 +1,6 @@
+import Link from 'next/link';
+
+const features = [
+  ['Any Query', 'Full SQLite SQL in the browser.'], ['Worker-Threaded', 'Queries stay off the main thread.'], ['Persisted in OPFS', 'Durable, explicit browser storage.'], ['Simple API', 'run, query, transaction, migrate.'], ['Reactive', 'React hooks and invalidation tags.'], ['Multi-Tab Safe', 'Web Locks and BroadcastChannel.'], ['TypeScript + ORMs', 'Typed rows plus Kysely/Drizzle-ready SQL.'], ['Offline-First & Sync', 'Keep local workflows available offline.'],
+];
+export default function Home() { return <main><section className="hero"><div className="muted">Polar Bear Database</div><h1>SQLite, local-first.</h1><p className="muted">A production-minded browser database with OPFS persistence, worker threading, React hooks, and safe multi-tab coordination.</p><p><Link className="card" href="/docs/getting-started">Get started →</Link></p></section><section className="grid">{features.map(([title, text]) => <article className="card" key={title}><h3>{title}</h3><p className="muted">{text}</p></article>)}</section><h2>Why pbdb?</h2><p className="muted">pbdb is a professionalized fork of <a href="https://github.com/Lona-up/lona-q">lona-q</a>, keeping its browser SQLite spirit while adding stronger migrations, worker isolation, and documentation in English and Brazilian Portuguese.</p></main>; }
