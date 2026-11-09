@@ -1,0 +1,14 @@
+---
+title: Primeiros passos
+---
+
+```bash
+bun add pbdb
+```
+
+```typescript
+import { createDB } from 'pbdb';
+
+const db = await createDB('farmacia');
+await db.run('CREATE TABLE IF NOT EXISTS vendas (id INTEGER PRIMARY KEY)');
+```

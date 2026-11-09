@@ -1,8 +1,24 @@
+import 'nextra-theme-docs/style.css';
 import './globals.css';
-import Link from 'next/link';
+import { Layout, Navbar, Footer } from 'nextra-theme-docs';
+import { getPageMap } from 'nextra/page-map';
+import type { ReactNode } from 'react';
 
-export const metadata = { title: 'pbdb — Polar Bear Database', description: 'Browser SQLite for offline-first applications.' };
+export const metadata = {
+  title: 'pbdb — Polar Bear Database',
+  description: 'Browser SQLite for offline-first applications.',
+};
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <><nav><Link className="brand" href="/">🐻‍❄️ pbdb</Link><Link href="/docs/getting-started">Docs</Link><Link href="/translate">Translate</Link><a href="https://github.com/yagasaki/pbdb">GitHub</a><Link href="/pt-BR">PT-BR</Link></nav>{children}</>;
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <Layout>
+          <Navbar pageMap={await getPageMap()} logo={<strong>🐻‍❄️ pbdb</strong>} />
+          {children}
+          <Footer>pbdb — Polar Bear Database</Footer>
+        </Layout>
+      </body>
+    </html>
+  );
 }

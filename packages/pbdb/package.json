@@ -27,7 +27,7 @@
     "lint": "eslint src tests",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "changeset": "changeset"
+    "changeset": "bunx changeset"
   },
   "dependencies": { "wa-sqlite": "^1.0.0" },
   "peerDependencies": { "react": ">=18.0.0" },

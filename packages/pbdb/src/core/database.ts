@@ -16,7 +16,7 @@ class PbdbDatabaseImpl implements PbdbDatabase {
   private transport: Transport;
   private counter = 0;
   private pending = new Map<string, {
-    resolve: (v: any) => void;
+    resolve: (v: unknown) => void;
     reject: (e: Error) => void;
     timer: ReturnType<typeof setTimeout>;
   }>();
@@ -39,7 +39,7 @@ class PbdbDatabaseImpl implements PbdbDatabase {
     this.wireTransport(transport);
   }
 
-  private wireTransport(transport: Transport) {
+  private wireTransport(transport: Transport): void {
     transport.onmessage = (e: { data: WorkerResponse }) => {
       if (e.data.type === 'change') {
         const { tables } = e.data as { type: 'change'; tables: string[] };
@@ -56,9 +56,9 @@ class PbdbDatabaseImpl implements PbdbDatabase {
       this.pending.delete(id);
 
       if (e.data.type === 'success') {
-        cb.resolve((e.data as any).result);
+        cb.resolve((e.data as { result?: unknown }).result);
       } else {
-      const error = new Error((e.data as any).message);
+      const error = new Error((e.data as { message: string }).message);
       this.onError?.(error);
       cb.reject(error);
       }
@@ -71,27 +71,27 @@ class PbdbDatabaseImpl implements PbdbDatabase {
     this.wireTransport(transport);
   }
 
-  send(msg: Record<string, any>, transfer?: Transferable[]): Promise<any> {
-    return new Promise((resolve, reject) => {
+  send<T = unknown>(msg: Record<string, unknown>, transfer?: Transferable[]): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
       const id = String(++this.counter);
       const timer = setTimeout(() => {
         this.pending.delete(id);
         reject(new PbdbTimeoutError());
       }, this.queryTimeout);
 
-      this.pending.set(id, { resolve, reject, timer });
+      this.pending.set(id, { resolve: (value) => resolve(value as T), reject, timer });
       this.transport.postMessage({ id, ...msg }, transfer);
     });
   }
 
   async run(sql: string, params: unknown[] = []): Promise<void> {
     if (!this._isReady) throw new PbdbNotReadyError();
-    await this.send({ type: 'run', sql, params });
+    await this.send<void>({ type: 'run', sql, params });
   }
 
   async query<T = Record<string, unknown>>(sql: string, params: unknown[] = []): Promise<T[]> {
     if (!this._isReady) throw new PbdbNotReadyError();
-    return (await this.send({ type: 'query', sql, params })) as T[];
+    return this.send<T[]>({ type: 'query', sql, params });
   }
 
   async getOne<T = Record<string, unknown>>(sql: string, params: unknown[] = []): Promise<T | null> {
@@ -104,10 +104,10 @@ class PbdbDatabaseImpl implements PbdbDatabase {
     await this.send({ type: 'run', sql: 'BEGIN', params: [] });
     try {
       const tx: PbdbTransaction = {
-        run: (sql, params = []) => this.send({ type: 'run', sql, params }),
-        query: (sql, params = []) => this.send({ type: 'query', sql, params }),
-        getOne: async (sql, params = []) => {
-          const rows = await this.send({ type: 'query', sql, params });
+        run: (sql, params = []) => this.send<void>({ type: 'run', sql, params }),
+        query: <TResult = Record<string, unknown>>(sql: string, params: unknown[] = []) => this.send<TResult[]>({ type: 'query', sql, params }),
+        getOne: async <TResult = Record<string, unknown>>(sql: string, params: unknown[] = []): Promise<TResult | null> => {
+          const rows = await this.send<TResult[]>({ type: 'query', sql, params });
           return rows[0] ?? null;
         },
       };
@@ -122,13 +122,14 @@ class PbdbDatabaseImpl implements PbdbDatabase {
 
   async export(): Promise<ExportPayload> {
     if (!this._isReady) throw new PbdbNotReadyError();
-    const data = (await this.send({ type: 'export' })) as Uint8Array;
+    const data = await this.send<Uint8Array>({ type: 'export' });
     return { version: 1, schemaVersion: 0, createdAt: new Date().toISOString(), data };
   }
 
   async exportSQLite(): Promise<ArrayBuffer> {
-    const payload = await this.export();
-    return payload.data.buffer.slice(payload.data.byteOffset, payload.data.byteOffset + payload.data.byteLength) as ArrayBuffer;
+    if (!this._isReady) throw new PbdbNotReadyError();
+    const data = await this.send<Uint8Array>({ type: 'exportSQLite' });
+    return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength) as ArrayBuffer;
   }
 
   async import(payload: ExportPayload): Promise<void> {
@@ -137,7 +138,8 @@ class PbdbDatabaseImpl implements PbdbDatabase {
   }
 
   async importSQLite(data: ArrayBuffer): Promise<void> {
-    await this.import({ version: 1, schemaVersion: 0, createdAt: new Date().toISOString(), data: new Uint8Array(data) });
+    if (!this._isReady) throw new PbdbNotReadyError();
+    await this.send({ type: 'importSQLite', data: new Uint8Array(data) });
   }
 
   async migrate(migrations: Migration[] = []): Promise<void> { await runMigrations(this, migrations); }
@@ -187,13 +189,11 @@ export async function createDB(
 
   // Web Locks API が使えればリーダー選出でマルチタブ対応
   if (typeof navigator !== 'undefined' && navigator.locks) {
-    const { transport, cleanup: _cleanup } = await electLeader(dbName, () =>
+    const { transport, onTransportChange } = await electLeader(dbName, () =>
       new Worker(new URL('./worker.js', import.meta.url), { type: 'module' })
     );
     db = new PbdbDatabaseImpl(transport, DEFAULT_QUERY_TIMEOUT, options);
-
-    // リーダー昇格コールバックを登録
-    // electLeader 内の onTransportReady に接続
+    onTransportChange((nextTransport) => db._replaceTransport(nextTransport));
   } else {
     // フォールバック: シングルタブモード（Web Locks 非対応環境）
     const worker = new Worker(

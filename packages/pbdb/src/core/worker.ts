@@ -1,6 +1,5 @@
 import SQLiteESMFactory from 'wa-sqlite/dist/wa-sqlite.mjs';
 import * as SQLite from 'wa-sqlite';
-// @ts-ignore wa-sqlite has no type declarations for VFS examples
 import { AccessHandlePoolVFS } from 'wa-sqlite/src/examples/AccessHandlePoolVFS.js';
 import type { WorkerRequest, WorkerResponse } from './types';
 
@@ -8,7 +7,8 @@ import type { WorkerRequest, WorkerResponse } from './types';
 type SQLParams = (number | string | Uint8Array | number[] | bigint | null)[];
 
 let sqlite3: ReturnType<typeof SQLite.Factory>;
-let db: number;
+let db: number | undefined;
+let activeDbName = '';
 
 function extractMutatedTables(sql: string): string[] {
   const tables = new Set<string>();
@@ -41,7 +41,7 @@ function notifyChange(sql: string) {
 }
 
 // OPFS ディレクトリを再帰的に削除する
-async function clearOPFSDirectory(path: string) {
+async function clearOPFSDirectory(path: string): Promise<void> {
   try {
     const root = await navigator.storage.getDirectory();
     let dir = root;
@@ -49,7 +49,8 @@ async function clearOPFSDirectory(path: string) {
       dir = await dir.getDirectoryHandle(segment);
     }
     // ディレクトリ内の全エントリを削除
-    for await (const [name] of (dir as any).entries()) {
+    const entries = dir as FileSystemDirectoryHandle & { entries(): AsyncIterableIterator<[string, FileSystemHandle]> };
+    for await (const [name] of entries.entries()) {
       await dir.removeEntry(name, { recursive: true });
     }
   } catch {
@@ -59,6 +60,7 @@ async function clearOPFSDirectory(path: string) {
 
 async function initDB(dbName: string) {
   if (db !== undefined) return;
+  activeDbName = dbName;
   console.debug('[pbdb] initializing...');
 
   const dirPath = `/pbdb/${dbName}`;
@@ -109,7 +111,7 @@ async function handleExport(): Promise<Uint8Array> {
 
   // テーブル定義を取得
   const tables: { name: string; sql: string }[] = [];
-  await sqlite3.exec(db,
+  await sqlite3.exec(db as number,
     "SELECT name, sql FROM sqlite_master WHERE type='table' AND name NOT LIKE '_pbdb_%' ORDER BY name",
     (row: unknown[], columns: string[]) => {
       tables.push({ name: row[0] as string, sql: row[1] as string });
@@ -121,7 +123,7 @@ async function handleExport(): Promise<Uint8Array> {
 
     // テーブルデータを取得
     const rows: unknown[][] = [];
-    await sqlite3.exec(db, `SELECT * FROM "${table.name}"`,
+    await sqlite3.exec(db as number, `SELECT * FROM "${table.name}"`,
       (row: unknown[]) => { rows.push([...row]); }
     );
     dump.data[table.name] = rows;
@@ -131,6 +133,39 @@ async function handleExport(): Promise<Uint8Array> {
   return new TextEncoder().encode(json);
 }
 
+async function getDatabaseDirectory(): Promise<FileSystemDirectoryHandle> {
+  const root = await navigator.storage.getDirectory();
+  const pbdbDirectory = await root.getDirectoryHandle('pbdb');
+  return pbdbDirectory.getDirectoryHandle(activeDbName);
+}
+
+async function handleSQLiteExport(): Promise<Uint8Array> {
+  const fileName = `export-${crypto.randomUUID()}.sqlite`;
+  await sqlite3.exec(db as number, 'PRAGMA wal_checkpoint(TRUNCATE)');
+  await sqlite3.exec(db as number, `VACUUM INTO '${fileName}'`);
+  const directory = await getDatabaseDirectory();
+  const fileHandle = await directory.getFileHandle(fileName);
+  const file = await fileHandle.getFile();
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  await directory.removeEntry(fileName);
+  return bytes;
+}
+
+async function handleSQLiteImport(data: Uint8Array): Promise<void> {
+  if (db === undefined) throw new Error('Database is not initialized');
+  await sqlite3.close(db);
+  db = undefined;
+  await clearOPFSDirectory(`/pbdb/${activeDbName}`);
+  const root = await navigator.storage.getDirectory();
+  const pbdbDirectory = await root.getDirectoryHandle('pbdb');
+  const directory = await pbdbDirectory.getDirectoryHandle(activeDbName, { create: true });
+  const fileHandle = await directory.getFileHandle(`${activeDbName}.db`, { create: true });
+  const writable = await fileHandle.createWritable();
+  await writable.write(new Uint8Array(data));
+  await writable.close();
+  await initDB(activeDbName);
+}
+
 // === Import: JSON ダンプからテーブルを復元 ===
 async function handleImport(data: Uint8Array): Promise<void> {
   const json = new TextDecoder().decode(data);
@@ -138,17 +173,17 @@ async function handleImport(data: Uint8Array): Promise<void> {
 
   // 既存テーブルを全削除
   const existingTables: string[] = [];
-  await sqlite3.exec(db,
+  await sqlite3.exec(db as number,
     "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '_pbdb_%'",
     (row: unknown[]) => { existingTables.push(row[0] as string); }
   );
   for (const name of existingTables) {
-    await sqlite3.exec(db, `DROP TABLE IF EXISTS "${name}"`);
+    await sqlite3.exec(db as number, `DROP TABLE IF EXISTS "${name}"`);
   }
 
   // スキーマを復元
   for (const sql of dump.schema) {
-    await sqlite3.exec(db, sql);
+    await sqlite3.exec(db as number, sql);
   }
 
   // データを復元
@@ -158,7 +193,7 @@ async function handleImport(data: Uint8Array): Promise<void> {
     const placeholders = Array(colCount).fill('?').join(',');
     const insertSql = `INSERT INTO "${tableName}" VALUES (${placeholders})`;
     for (const row of rows) {
-      await sqlite3.run(db, insertSql, row as SQLParams);
+      await sqlite3.run(db as number, insertSql, row as SQLParams);
     }
   }
 }
@@ -176,7 +211,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
 
       case 'run': {
         const { sql, params } = event.data;
-        await sqlite3.run(db, sql, params.length > 0 ? params as SQLParams : undefined);
+        await sqlite3.run(db as number, sql, params.length > 0 ? params as SQLParams : undefined);
         respond({ id, type: 'success' });
         notifyChange(sql);
         break;
@@ -185,7 +220,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
       case 'query': {
         const { sql, params } = event.data;
         const { rows, columns } = await sqlite3.execWithParams(
-          db, sql, params.length > 0 ? params as SQLParams : undefined
+          db as number, sql, params.length > 0 ? params as SQLParams : undefined
         );
         const results = rows.map((row: unknown[]) => {
           const obj: Record<string, unknown> = {};
@@ -204,14 +239,26 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
         break;
       }
 
+      case 'exportSQLite': {
+        const data = await handleSQLiteExport();
+        respond({ id, type: 'success', result: data });
+        break;
+      }
+
       case 'import': {
         await handleImport(event.data.data);
         respond({ id, type: 'success' });
         break;
       }
 
+      case 'importSQLite': {
+        await handleSQLiteImport(event.data.data);
+        respond({ id, type: 'success' });
+        break;
+      }
+
       case 'close': {
-        await sqlite3.close(db);
+        await sqlite3.close(db as number);
         respond({ id, type: 'success' });
         break;
       }

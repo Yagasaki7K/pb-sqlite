@@ -2,4 +2,4 @@
 "pbdb": minor
 ---
 
-Forked and professionalized from lona-q with a pnpm workspace foundation, typed errors, checksum-aware migrations, OPFS-only initialization, React aliases, and bilingual documentation scaffolding.
+Forked and professionalized from lona-q with a Bun workspace foundation, typed errors, checksum-aware migrations, native SQLite export/import, real OPFS leader failover, React aliases, and bilingual Nextra documentation.

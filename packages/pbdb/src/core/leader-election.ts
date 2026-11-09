@@ -8,6 +8,7 @@ const HEARTBEAT_TIMEOUT = 3000;
 interface ElectionResult {
   transport: Transport;
   cleanup: () => void;
+  onTransportChange: (callback: (transport: Transport) => void) => void;
 }
 
 /**
@@ -94,6 +95,7 @@ export function electLeader(
         }
 
         // 新リーダーとしてトランスポートを差し替え
+        currentTransport?.close();
         const newTransport = becomeLeader();
         currentTransport = newTransport;
         onTransportReady?.(newTransport);
@@ -122,12 +124,12 @@ export function electLeader(
       if (lock) {
         const transport = becomeLeader();
         currentTransport = transport;
-        resolve({ transport, cleanup: createCleanup() });
+        resolve({ transport, cleanup: createCleanup(), onTransportChange: (callback) => { onTransportReady = callback; } });
         await new Promise(() => {});
       } else {
         const transport = becomeFollower();
         currentTransport = transport;
-        resolve({ transport, cleanup: createCleanup() });
+        resolve({ transport, cleanup: createCleanup(), onTransportChange: (callback) => { onTransportReady = callback; } });
       }
     });
   });

@@ -1,11 +1,13 @@
 // === Worker 通信プロトコル ===
 
 export type WorkerRequest =
-  | { id: string; type: 'init'; dbName: string; storage: 'auto' | 'opfs' | 'idb' }
+  | { id: string; type: 'init'; dbName: string; storage?: 'auto' | 'opfs' | 'idb' }
   | { id: string; type: 'run'; sql: string; params: unknown[] }
   | { id: string; type: 'query'; sql: string; params: unknown[] }
   | { id: string; type: 'export' }
+  | { id: string; type: 'exportSQLite' }
   | { id: string; type: 'import'; data: Uint8Array }
+  | { id: string; type: 'importSQLite'; data: Uint8Array }
   | { id: string; type: 'close' };
 
 export type WorkerResponse =

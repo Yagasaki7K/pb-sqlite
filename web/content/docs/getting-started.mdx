@@ -1,0 +1,20 @@
+---
+title: Getting started
+---
+
+## Install
+
+```bash
+bun add pbdb
+```
+
+## Create a database
+
+```typescript
+import { createDB } from 'pbdb';
+
+const db = await createDB('pharmacy');
+await db.run('CREATE TABLE IF NOT EXISTS sales (id INTEGER PRIMARY KEY)');
+```
+
+The database is stored in OPFS and coordinated across tabs through Web Locks and BroadcastChannel.

@@ -6,7 +6,7 @@
 
 ## Features
 
-- **Just `npm install`** — Zero configuration required
+- **Just `bun add`** — Zero configuration required
 - **Data persists after closing the browser** — Saved to OPFS (Origin Private File System)
 - **Data stays in the browser** — Never sent to a server (privacy-first)
 - **Real SQLite** — Full support for JOINs, transactions, and indexes
@@ -19,7 +19,7 @@
 ### Install
 
 ```bash
-npm install pbdb
+bun add pbdb
 ```
 
 ### Vanilla JS
@@ -192,7 +192,7 @@ No special configuration needed — just call `createDB()` and it works.
 
 ## Deploying to Vercel / Next.js
 
-No special configuration required. Just `npm run build` and deploy to Vercel.
+No special configuration required. Just `bun run build` and deploy to Vercel.
 
 **Note**: lona-q runs on the client side only. It cannot be used in Server Components. The `'use client'` directive is required.
 
@@ -236,7 +236,7 @@ MIT
 
 ### Features
 
-- **npm install するだけで動く** — 追加設定不要
+- **bun add するだけで動く** — 追加設定不要
 - **ブラウザを閉じてもデータが残る** — OPFS に永続保存
 - **データはブラウザ内に保存** — サーバーに送信されない（プライバシーファースト）
 - **本物の SQLite** — JOIN, トランザクション, インデックス全対応
@@ -249,7 +249,7 @@ MIT
 #### Install
 
 ```bash
-npm install @lona-up/lona-q
+bun add @lona-up/lona-q
 ```
 
 #### Vanilla JS
@@ -422,7 +422,7 @@ lona-q はリーダー選出パターンで複数タブに対応しています�
 
 ### Vercel / Next.js にデプロイ
 
-特別な設定は不要です。`npm run build` して Vercel にデプロイするだけ。
+特別な設定は不要です。`bun run build` して Vercel にデプロイするだけ。
 
 **注意**: lona-q はクライアントサイドのみで動作します。Server Components では使えません。`'use client'` ディレクティブが必要です。
 

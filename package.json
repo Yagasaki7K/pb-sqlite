@@ -3,19 +3,25 @@
   "private": true,
   "version": "0.2.0",
   "description": "Polar Bear Database workspace",
-  "packageManager": "pnpm@9.15.4",
-  "engines": { "node": ">=18" },
-  "workspaces": ["packages/*", "examples/*", "web"],
+  "packageManager": "bun@1.4.4",
+  "engines": {
+    "node": ">=18"
+  },
+  "workspaces": [
+    "packages/*",
+    "examples/*",
+    "web"
+  ],
   "scripts": {
-    "build": "pnpm --filter pbdb build && pnpm --dir web build",
-    "dev": "pnpm --filter pbdb dev",
-    "test": "pnpm --filter pbdb test",
-    "test:e2e": "pnpm --filter pbdb test:e2e",
-    "lint": "pnpm --filter pbdb lint",
-    "typecheck": "pnpm --filter pbdb typecheck",
-    "format": "prettier --write .",
-    "changeset": "changeset",
-    "ci": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
+    "build": "bun run --filter pbdb build && bun --cwd web run build",
+    "dev": "bun run --filter pbdb dev",
+    "test": "bun run --filter pbdb test",
+    "test:e2e": "bun run --filter pbdb test:e2e",
+    "lint": "bun run --filter pbdb lint",
+    "typecheck": "bun run --filter pbdb typecheck",
+    "format": "bunx prettier --write .",
+    "changeset": "bunx changeset",
+    "ci": "bun run typecheck && bun run lint && bun run test && bun run build"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",
