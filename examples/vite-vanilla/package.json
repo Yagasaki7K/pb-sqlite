@@ -1,0 +1,7 @@
+{
+  "name": "pb-sqlite-example-vite-vanilla",
+  "private": true,
+  "scripts": { "dev": "vite", "build": "vite build" },
+  "dependencies": { "pb-sqlite": "workspace:*" },
+  "devDependencies": { "vite": "^6.0.5", "typescript": "^5.9.3" }
+}

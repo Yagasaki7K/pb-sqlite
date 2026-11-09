@@ -8,6 +8,7 @@ function fakeDb(rows: Array<{ version: number; checksum: string }> = []): PbdbDa
   const db = {
     run: async (sql: string) => { statements.push(sql); },
     query: async <T>(sql: string) => (sql.includes('checksum') ? rows : []) as T[],
+    exec: async (sql: string) => { statements.push(sql); },
     transaction: async (fn: (tx: PbdbTransaction) => Promise<void>) => fn({ run: async (sql) => { statements.push(sql); }, query: async () => [], getOne: async () => null }),
     getOne: async () => null,
     migrate: async () => {}, rollback: async () => {}, export: async () => ({ version: 1 as const, schemaVersion: 0, createdAt: '', data: new Uint8Array() }), exportSQLite: async () => new ArrayBuffer(0), import: async () => {}, importSQLite: async () => {}, invalidate: () => {}, invalidateAll: () => {}, purgeSynced: async () => {}, close: async () => {}, onTableChange: () => () => {}, isReady: true,

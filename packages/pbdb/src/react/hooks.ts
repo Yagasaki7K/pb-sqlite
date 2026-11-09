@@ -1,8 +1,8 @@
 'use client';
 import { useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { PbdbContext } from './context';
-import type { PbdbDatabase, QueryOptions } from '../core/types';
-import { PbdbError } from '../core/errors';
+import { PbSqliteContext } from './context';
+import type { PbSqliteDatabase, QueryOptions } from '../core/types';
+import { PbSqliteError } from '../core/errors';
 
 export interface UseQueryResult<T> {
   data: T[];
@@ -11,10 +11,10 @@ export interface UseQueryResult<T> {
   refetch: () => Promise<void>;
 }
 
-export function usePbdb(): PbdbDatabase {
-  const ctx = useContext(PbdbContext);
+export function usePbSqlite(): PbSqliteDatabase {
+  const ctx = useContext(PbSqliteContext);
   if (!ctx) {
-    throw new PbdbError('usePbdb must be used within <PbdbProvider>');
+    throw new PbSqliteError('usePbSqlite must be used within <PbSqliteProvider>');
   }
   return ctx.db;
 }
@@ -46,7 +46,7 @@ export function useQuery<T = Record<string, unknown>>(
   params: unknown[] = [],
   options: QueryOptions = {}
 ): UseQueryResult<T> {
-  const db = usePbdb();
+  const db = usePbSqlite();
   const [data, setData] = useState<T[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -92,4 +92,7 @@ export function useQuery<T = Record<string, unknown>>(
 
   return { data, isLoading, error, refetch: fetchData };
 }
+
+/** @deprecated Use usePbSqlite. */
+export const usePbdb = usePbSqlite;
 

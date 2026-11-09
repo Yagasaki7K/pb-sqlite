@@ -1,11 +1,11 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
-import { PbdbContext } from './context';
+import { PbSqliteContext } from './context';
 import { createDB } from '../core/database';
 import { runMigrations } from '../core/migration';
-import type { PbdbDatabase, CreateDBOptions, Migration } from '../core/types';
+import type { PbSqliteDatabase, CreateDBOptions, Migration } from '../core/types';
 
-export interface PbdbProviderProps {
+export interface PbSqliteProviderProps {
   dbName: string;
   children: React.ReactNode;
   migrations?: Migration[];
@@ -15,7 +15,7 @@ export interface PbdbProviderProps {
   onError?: (error: Error) => void;
 }
 
-export function PbdbProvider({
+export function PbSqliteProvider({
   dbName,
   children,
   migrations,
@@ -24,13 +24,13 @@ export function PbdbProvider({
   debug,
   onError,
 }: PbdbProviderProps) {
-  const [db, setDb] = useState<PbdbDatabase | null>(null);
+  const [db, setDb] = useState<PbSqliteDatabase | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   // useRef は StrictMode の unmount/remount でリセットされない。
   // これにより createDB が1回だけ実行されることを保証する。
   const initRef = useRef(false);
-  const dbRef = useRef<PbdbDatabase | null>(null);
+  const dbRef = useRef<PbSqliteDatabase | null>(null);
 
   useEffect(() => {
     if (initRef.current) return;
@@ -68,9 +68,13 @@ export function PbdbProvider({
   }
 
   return React.createElement(
-    PbdbContext.Provider,
+    PbSqliteContext.Provider,
     { value: { db } },
     children
   );
 }
+
+/** @deprecated Use PbSqliteProvider. */
+export const PbdbProvider = PbSqliteProvider;
+export type PbdbProviderProps = PbSqliteProviderProps;
 

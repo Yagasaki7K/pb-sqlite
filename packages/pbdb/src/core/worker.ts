@@ -23,7 +23,7 @@ function extractMutatedTables(sql: string): string[] {
     let match;
     while ((match = pattern.exec(sql)) !== null) {
       const name = match[1].toLowerCase();
-      if (!name.startsWith('_pbdb_')) tables.add(name);
+    if (!name.startsWith('_pbsqlite_')) tables.add(name);
     }
   }
   return Array.from(tables);
@@ -61,9 +61,9 @@ async function clearOPFSDirectory(path: string): Promise<void> {
 async function initDB(dbName: string) {
   if (db !== undefined) return;
   activeDbName = dbName;
-  console.debug('[pbdb] initializing...');
+  console.debug('[pb-sqlite] initializing...');
 
-  const dirPath = `/pbdb/${dbName}`;
+  const dirPath = `/pbsqlite/${dbName}`;
 
   const module = await SQLiteESMFactory();
   sqlite3 = SQLite.Factory(module);
@@ -83,23 +83,12 @@ async function initDB(dbName: string) {
   try {
     db = await sqlite3.open_v2(`${dbName}.db`);
   } catch (e) {
-    // DB オープン失敗 → OPFS をクリアして再試行（1回だけ）
-    console.warn('[pbdb] DB open failed, clearing OPFS and retrying...');
-    try { await vfs.close(); } catch { /* ignore */ }
-    await clearOPFSDirectory(dirPath);
-
-    // wa-sqlite を再初期化
-    const module2 = await SQLiteESMFactory();
-    sqlite3 = SQLite.Factory(module2);
-
-    const vfs2 = new AccessHandlePoolVFS(dirPath);
-    await vfs2.isReady;
-    sqlite3.vfs_register(vfs2, true);
-
-    db = await sqlite3.open_v2(`${dbName}.db`);
+    console.error('[pb-sqlite] DB open failed; existing OPFS data was left untouched.');
+    throw e;
   }
 
-  console.debug('[pbdb] DB opened');
+  await sqlite3.exec(db as number, 'PRAGMA journal_mode=WAL');
+  console.debug('[pb-sqlite] DB opened');
 }
 
 // === Export: 全テーブルの CREATE 文とデータを JSON として返す ===
@@ -112,7 +101,7 @@ async function handleExport(): Promise<Uint8Array> {
   // テーブル定義を取得
   const tables: { name: string; sql: string }[] = [];
   await sqlite3.exec(db as number,
-    "SELECT name, sql FROM sqlite_master WHERE type='table' AND name NOT LIKE '_pbdb_%' ORDER BY name",
+    "SELECT name, sql FROM sqlite_master WHERE type='table' AND name NOT LIKE '_pbsqlite_%' ORDER BY name",
     (row: unknown[], columns: string[]) => {
       tables.push({ name: row[0] as string, sql: row[1] as string });
     }
@@ -135,8 +124,8 @@ async function handleExport(): Promise<Uint8Array> {
 
 async function getDatabaseDirectory(): Promise<FileSystemDirectoryHandle> {
   const root = await navigator.storage.getDirectory();
-  const pbdbDirectory = await root.getDirectoryHandle('pbdb');
-  return pbdbDirectory.getDirectoryHandle(activeDbName);
+  const pbsqliteDirectory = await root.getDirectoryHandle('pbsqlite');
+  return pbsqliteDirectory.getDirectoryHandle(activeDbName);
 }
 
 async function handleSQLiteExport(): Promise<Uint8Array> {
@@ -155,10 +144,10 @@ async function handleSQLiteImport(data: Uint8Array): Promise<void> {
   if (db === undefined) throw new Error('Database is not initialized');
   await sqlite3.close(db);
   db = undefined;
-  await clearOPFSDirectory(`/pbdb/${activeDbName}`);
+  await clearOPFSDirectory(`/pbsqlite/${activeDbName}`);
   const root = await navigator.storage.getDirectory();
-  const pbdbDirectory = await root.getDirectoryHandle('pbdb');
-  const directory = await pbdbDirectory.getDirectoryHandle(activeDbName, { create: true });
+  const pbsqliteDirectory = await root.getDirectoryHandle('pbsqlite');
+  const directory = await pbsqliteDirectory.getDirectoryHandle(activeDbName, { create: true });
   const fileHandle = await directory.getFileHandle(`${activeDbName}.db`, { create: true });
   const writable = await fileHandle.createWritable();
   await writable.write(new Uint8Array(data));
@@ -174,7 +163,7 @@ async function handleImport(data: Uint8Array): Promise<void> {
   // 既存テーブルを全削除
   const existingTables: string[] = [];
   await sqlite3.exec(db as number,
-    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '_pbdb_%'",
+    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '_pbsqlite_%'",
     (row: unknown[]) => { existingTables.push(row[0] as string); }
   );
   for (const name of existingTables) {
@@ -265,7 +254,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
     }
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('[pbdb] error:', message);
+    console.error('[pb-sqlite] error:', message);
     respond({ id, type: 'error', message });
   }
 };

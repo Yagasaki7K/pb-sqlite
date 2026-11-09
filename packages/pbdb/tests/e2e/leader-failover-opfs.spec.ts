@@ -16,7 +16,7 @@ async function openDatabase(page: import('@playwright/test').Page, dbName: strin
     const moduleUrl = '/packages/pbdb/dist/index.js';
     const { createDB } = await import(moduleUrl);
     const database = await createDB(name);
-    await database.run('CREATE TABLE IF NOT EXISTS failover (id INTEGER PRIMARY KEY, value TEXT NOT NULL)');
+    await database.exec('CREATE TABLE IF NOT EXISTS failover (id INTEGER PRIMARY KEY, value TEXT NOT NULL)');
     (globalThis as unknown as { database: unknown }).database = database;
   }, dbName);
 }
@@ -30,16 +30,29 @@ test('keeps OPFS SQLite available after the leader tab closes', async ({ browser
   await openDatabase(leader, dbName);
   await openDatabase(follower, dbName);
   await leader.evaluate(async () => {
-    const database = (globalThis as unknown as { database: { run(sql: string, params?: unknown[]): Promise<void> } }).database;
+    const database = (globalThis as unknown as { database: { run(sql: string, params?: unknown[]): Promise<void>; transaction(fn: (tx: { run(sql: string, params?: unknown[]): Promise<void> }) => Promise<void>): Promise<void> } }).database;
     await database.run('INSERT INTO failover (value) VALUES (?)', ['before-failover']);
+    await database.transaction(async (tx) => {
+      await tx.run('INSERT INTO failover (value) VALUES (?)', ['committed']);
+    });
+    let rolledBack = false;
+    try {
+      await database.transaction(async (tx) => {
+        await tx.run('INSERT INTO failover (value) VALUES (?)', ['rolled-back']);
+        throw new Error('rollback test');
+      });
+    } catch (error) {
+      rolledBack = error instanceof Error && error.message === 'rollback test';
+    }
+    if (!rolledBack) throw new Error('rollback test did not reject');
   });
 
   await leader.close();
   await expect.poll(async () => follower.evaluate(async () => {
     const database = (globalThis as unknown as { database: { query<T>(sql: string): Promise<T[]> } }).database;
-    const rows = await database.query<{ value: string }>('SELECT value FROM failover');
-    return rows[0]?.value;
-  }), { timeout: 10_000 }).toBe('before-failover');
+    const rows = await database.query<{ value: string }>('SELECT value FROM failover ORDER BY id');
+    return rows.map((row) => row.value).join(',');
+  }), { timeout: 10_000 }).toBe('before-failover,committed');
 
   const exportHeader = await follower.evaluate(async () => {
     const database = (globalThis as unknown as { database: { exportSQLite(): Promise<ArrayBuffer> } }).database;

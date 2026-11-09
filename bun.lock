@@ -36,6 +36,16 @@
         "vite": "^6.0.5",
       },
     },
+    "examples/vite-vanilla": {
+      "name": "pb-sqlite-example-vite-vanilla",
+      "dependencies": {
+        "pb-sqlite": "workspace:*",
+      },
+      "devDependencies": {
+        "typescript": "^5.9.3",
+        "vite": "^6.0.5",
+      },
+    },
     "packages/pbdb": {
       "name": "pb-sqlite",
       "version": "0.2.0",
@@ -1607,6 +1617,8 @@
     "pb-sqlite": ["pb-sqlite@workspace:packages/pbdb"],
 
     "pb-sqlite-docs": ["pb-sqlite-docs@workspace:web"],
+
+    "pb-sqlite-example-vite-vanilla": ["pb-sqlite-example-vite-vanilla@workspace:examples/vite-vanilla"],
 
     "pbdb-example-nextjs": ["pbdb-example-nextjs@workspace:examples/nextjs-app-router"],
 

@@ -4,16 +4,17 @@ export { runMigrations, rollbackMigrations, checksumMigration } from './core/mig
 
 // Errors
 export {
-  PbdbError,
+  PbSqliteError,
+  WorkerCrashedError,
   OPFSUnavailableError,
   QuotaExceededError,
   MigrationChecksumMismatchError,
   SchemaVersionMismatchError,
   LeaderElectionError,
-  PbdbNotReadyError,
-  PbdbQueryError,
-  PbdbStorageError,
-  PbdbTimeoutError,
+  PbSqliteNotReadyError,
+  PbSqliteQueryError,
+  PbSqliteStorageError,
+  PbSqliteTimeoutError,
 } from './core/errors';
 
 // Utilities
@@ -25,8 +26,9 @@ export {
 
 // Types
 export type {
-  PbdbDatabase,
-  PbdbDB,
+  PbSqliteDatabase,
+  PbSqliteDB,
+  PbSqliteTransaction,
   PbdbTransaction,
   CreateDBOptions,
   Migration,

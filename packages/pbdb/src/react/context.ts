@@ -1,9 +1,11 @@
 'use client';
 import { createContext } from 'react';
-import type { PbdbDatabase } from '../core/types';
+import type { PbSqliteDatabase } from '../core/types';
 
-export interface PbdbContextValue {
-  db: PbdbDatabase;
+export interface PbSqliteContextValue {
+  db: PbSqliteDatabase;
 }
 
-export const PbdbContext = createContext<PbdbContextValue | null>(null);
+export const PbSqliteContext = createContext<PbSqliteContextValue | null>(null);
+/** @deprecated Use PbSqliteContext. */
+export const PbdbContext = PbSqliteContext;
