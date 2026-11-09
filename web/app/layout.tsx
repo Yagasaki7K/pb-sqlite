@@ -13,10 +13,12 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <Layout pageMap={pageMap}>
-          <Navbar logo={<strong>🐻‍❄️ pbdb</strong>} />
+        <Layout
+          pageMap={pageMap}
+          navbar={<Navbar logo={<strong>🐻‍❄️ pbdb</strong>} />}
+          footer={<Footer>pbdb — Polar Bear Database</Footer>}
+        >
           {children}
-          <Footer>pbdb — Polar Bear Database</Footer>
         </Layout>
       </body>
     </html>
