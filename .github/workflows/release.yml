@@ -6,7 +6,6 @@ on:
 
 jobs:
   release:
-    if: ${{ hashFiles('.changeset/*.md') != '' }}
     name: Changesets release
     runs-on: ubuntu-latest
     steps:
@@ -20,6 +19,7 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: bun install --frozen-lockfile
       - uses: changesets/action@v1
+        if: ${{ hashFiles('.changeset/*.md') != '' }}
         with:
           version: bunx changeset version
           publish: cd packages/pbdb && bun publish
