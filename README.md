@@ -1,8 +1,12 @@
-# pbdb (Polar Bear Database)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/1b1a0d0c-483c-40fc-a60e-4003430d5231"/>
+</p>
+
+# pbdb (Polarbear Database)
 
 > Browser SQLite for offline-first applications, with OPFS persistence, worker threading, React hooks, and safe multi-tab coordination.
 
-**Fork of [lona-q](https://github.com/Lona-up/lona-q) — professionalized fork with worker threading, robust migrations, Web Locks multi-tab, and i18n docs.**
+**Initial commit has a fork of [lona-q](https://github.com/Lona-up/lona-q)**
 
 ## Features
 
@@ -25,9 +29,9 @@ bun add pbdb
 ### Vanilla JS
 
 ```typescript
-import { createDB } from 'pbdb';
+import { createDB } from "pbdb";
 
-const db = await createDB('myapp');
+const db = await createDB("myapp");
 
 await db.run(`
   CREATE TABLE IF NOT EXISTS todos (
@@ -37,17 +41,17 @@ await db.run(`
   )
 `);
 
-await db.run('INSERT INTO todos (text) VALUES (?)', ['Buy milk']);
+await db.run("INSERT INTO todos (text) VALUES (?)", ["Buy milk"]);
 
-const todos = await db.query('SELECT * FROM todos');
+const todos = await db.query("SELECT * FROM todos");
 console.log(todos); // [{ id: 1, text: 'Buy milk', completed: 0 }]
 ```
 
 ### React
 
 ```tsx
-import { LonaQProvider, useLonaQ, useQuery } from '@lona-up/lona-q/react';
-import type { Migration } from '@lona-up/lona-q';
+import { LonaQProvider, useLonaQ, useQuery } from "pbdb/react";
+import type { Migration } from "pbdb";
 
 const migrations: Migration[] = [
   {
@@ -70,18 +74,22 @@ function App() {
 
 function TodoList() {
   const db = useLonaQ();
-  const { data: todos } = useQuery<{ id: number; text: string; completed: number }>(
-    'SELECT * FROM todos ORDER BY id DESC'
-  );
+  const { data: todos } = useQuery<{
+    id: number;
+    text: string;
+    completed: number;
+  }>("SELECT * FROM todos ORDER BY id DESC");
 
   const addTodo = async (text: string) => {
-    await db.run('INSERT INTO todos (text) VALUES (?)', [text]);
+    await db.run("INSERT INTO todos (text) VALUES (?)", [text]);
     // useQuery automatically refetches — no manual refresh needed
   };
 
   return (
     <ul>
-      {todos.map(todo => <li key={todo.id}>{todo.text}</li>)}
+      {todos.map((todo) => (
+        <li key={todo.id}>{todo.text}</li>
+      ))}
     </ul>
   );
 }
@@ -94,7 +102,7 @@ function TodoList() {
 Creates and connects to a database.
 
 ```typescript
-const db = await createDB('myapp');
+const db = await createDB("myapp");
 ```
 
 ### `db.run(sql, params?)`
@@ -102,7 +110,7 @@ const db = await createDB('myapp');
 Executes INSERT, UPDATE, DELETE, CREATE TABLE, etc.
 
 ```typescript
-await db.run('INSERT INTO users (name) VALUES (?)', ['Alice']);
+await db.run("INSERT INTO users (name) VALUES (?)", ["Alice"]);
 ```
 
 ### `db.query<T>(sql, params?)`
@@ -110,7 +118,9 @@ await db.run('INSERT INTO users (name) VALUES (?)', ['Alice']);
 Executes a SELECT query and returns an array of results.
 
 ```typescript
-const users = await db.query<{ id: number; name: string }>('SELECT * FROM users');
+const users = await db.query<{ id: number; name: string }>(
+  "SELECT * FROM users",
+);
 ```
 
 ### `db.getOne<T>(sql, params?)`
@@ -118,7 +128,7 @@ const users = await db.query<{ id: number; name: string }>('SELECT * FROM users'
 Returns the first row, or `null` if none found.
 
 ```typescript
-const user = await db.getOne('SELECT * FROM users WHERE id = ?', [1]);
+const user = await db.getOne("SELECT * FROM users WHERE id = ?", [1]);
 ```
 
 ### `db.transaction(fn)`
@@ -127,8 +137,14 @@ Executes a transaction. Automatically rolls back on error.
 
 ```typescript
 await db.transaction(async (tx) => {
-  await tx.run('UPDATE accounts SET balance = balance - ? WHERE id = ?', [100, 1]);
-  await tx.run('UPDATE accounts SET balance = balance + ? WHERE id = ?', [100, 2]);
+  await tx.run(
+    "UPDATE accounts SET balance = balance - ? WHERE id = ?",
+    [100, 1],
+  );
+  await tx.run(
+    "UPDATE accounts SET balance = balance + ? WHERE id = ?",
+    [100, 2],
+  );
 });
 ```
 
@@ -150,21 +166,21 @@ Closes the database and releases resources.
 
 ## React Hooks
 
-### `<LonaQProvider>`
+### `<PbqbProvider>`
 
 Place at the root of your app.
 
 ```tsx
-<LonaQProvider
+<PbqbProvider
   dbName="myapp"
-  migrations={[{ version: 1, up: 'CREATE TABLE ...' }]}
+  migrations={[{ version: 1, up: "CREATE TABLE ..." }]}
   fallback={<p>Loading...</p>}
 >
   {children}
-</LonaQProvider>
+</PbqbProvider>
 ```
 
-### `useLonaQ()`
+### `usePBQB()`
 
 Get the database instance (for mutations).
 
@@ -174,14 +190,14 @@ Reactive SELECT query. Automatically refetches when data changes.
 
 ```typescript
 const { data, isLoading, error, refetch } = useQuery<Todo>(
-  'SELECT * FROM todos WHERE completed = ?',
-  [0]
+  "SELECT * FROM todos WHERE completed = ?",
+  [0],
 );
 ```
 
 ## Multi-Tab Support
 
-lona-q supports multiple tabs via a leader election pattern.
+Polarbear supports multiple tabs via a leader election pattern.
 
 - The first tab to open becomes the **leader** and directly operates SQLite
 - Subsequent tabs become **followers** and execute queries through the leader
@@ -194,7 +210,7 @@ No special configuration needed — just call `createDB()` and it works.
 
 No special configuration required. Just `bun run build` and deploy to Vercel.
 
-**Note**: lona-q runs on the client side only. It cannot be used in Server Components. The `'use client'` directive is required.
+**Note**: Polarbear runs on the client side only. It cannot be used in Server Components. The `'use client'` directive is required.
 
 ## FAQ
 
@@ -211,7 +227,7 @@ A: It depends on the browser's storage quota (typically tens of percent of disk 
 A: Client-side only. The `'use client'` directive is required.
 
 **Q: What happens if I open multiple tabs?**
-A: lona-q uses a leader election pattern to handle this safely. No data conflicts will occur.
+A: Polarbear uses a leader election pattern to handle this safely. No data conflicts will occur.
 
 ## Browser Support
 
@@ -222,234 +238,8 @@ A: lona-q uses a leader election pattern to handle this safely. No data conflict
 
 ## Acknowledgments
 
-lona-q is built on [wa-sqlite](https://github.com/rhashimoto/wa-sqlite) by Roy T. Hashimoto (MIT License) — a WebAssembly build of SQLite.
+Polarbear is built on [wa-sqlite](https://github.com/rhashimoto/wa-sqlite) by Roy T. Hashimoto (MIT License) — a WebAssembly build of SQLite.
 
 ## License
-
-MIT
-
----
-
-## 日本語 / Japanese
-
-以下は日本語版のドキュメントです。
-
-### Features
-
-- **bun add するだけで動く** — 追加設定不要
-- **ブラウザを閉じてもデータが残る** — OPFS に永続保存
-- **データはブラウザ内に保存** — サーバーに送信されない（プライバシーファースト）
-- **本物の SQLite** — JOIN, トランザクション, インデックス全対応
-- **React hooks** — `useQuery` でリアクティブなデータバインディング
-- **複数タブ対応** — リーダー選出パターンで安全にデータ共有
-- **エクスポート/インポート** — データの持ち出し・復元が可能
-
-### Quick Start
-
-#### Install
-
-```bash
-bun add @lona-up/lona-q
-```
-
-#### Vanilla JS
-
-```typescript
-import { createDB } from '@lona-up/lona-q';
-
-const db = await createDB('myapp');
-
-await db.run(`
-  CREATE TABLE IF NOT EXISTS todos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    text TEXT NOT NULL,
-    completed INTEGER DEFAULT 0
-  )
-`);
-
-await db.run('INSERT INTO todos (text) VALUES (?)', ['Buy milk']);
-
-const todos = await db.query('SELECT * FROM todos');
-console.log(todos); // [{ id: 1, text: 'Buy milk', completed: 0 }]
-```
-
-#### React
-
-```tsx
-import { LonaQProvider, useLonaQ, useQuery } from '@lona-up/lona-q/react';
-import type { Migration } from '@lona-up/lona-q';
-
-const migrations: Migration[] = [
-  {
-    version: 1,
-    up: `CREATE TABLE todos (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      text TEXT NOT NULL,
-      completed INTEGER DEFAULT 0
-    )`,
-  },
-];
-
-function App() {
-  return (
-    <LonaQProvider dbName="myapp" migrations={migrations}>
-      <TodoList />
-    </LonaQProvider>
-  );
-}
-
-function TodoList() {
-  const db = useLonaQ();
-  const { data: todos } = useQuery<{ id: number; text: string; completed: number }>(
-    'SELECT * FROM todos ORDER BY id DESC'
-  );
-
-  const addTodo = async (text: string) => {
-    await db.run('INSERT INTO todos (text) VALUES (?)', [text]);
-    // useQuery が自動的に再取得 — 手動リフレッシュ不要
-  };
-
-  return (
-    <ul>
-      {todos.map(todo => <li key={todo.id}>{todo.text}</li>)}
-    </ul>
-  );
-}
-```
-
-### API リファレンス
-
-#### `createDB(dbName, options?)`
-
-データベースを作成して接続します。
-
-```typescript
-const db = await createDB('myapp');
-```
-
-#### `db.run(sql, params?)`
-
-INSERT, UPDATE, DELETE, CREATE TABLE 等を実行します。
-
-```typescript
-await db.run('INSERT INTO users (name) VALUES (?)', ['Alice']);
-```
-
-#### `db.query<T>(sql, params?)`
-
-SELECT クエリを実行し、結果の配列を返します。
-
-```typescript
-const users = await db.query<{ id: number; name: string }>('SELECT * FROM users');
-```
-
-#### `db.getOne<T>(sql, params?)`
-
-最初の1行を返します（なければ `null`）。
-
-```typescript
-const user = await db.getOne('SELECT * FROM users WHERE id = ?', [1]);
-```
-
-#### `db.transaction(fn)`
-
-トランザクションを実行します。エラー時は自動ロールバック。
-
-```typescript
-await db.transaction(async (tx) => {
-  await tx.run('UPDATE accounts SET balance = balance - ? WHERE id = ?', [100, 1]);
-  await tx.run('UPDATE accounts SET balance = balance + ? WHERE id = ?', [100, 2]);
-});
-```
-
-#### `db.export()` / `db.import(data)`
-
-データベースを JSON 形式でエクスポート/インポートします。
-
-```typescript
-const data = await db.export();
-// data を保存...
-
-// 別環境で復元
-await db.import(data);
-```
-
-#### `db.close()`
-
-データベースを閉じてリソースを解放します。
-
-### React Hooks
-
-#### `<LonaQProvider>`
-
-アプリのルートに配置します。
-
-```tsx
-<LonaQProvider
-  dbName="myapp"
-  migrations={[{ version: 1, up: 'CREATE TABLE ...' }]}
-  fallback={<p>Loading...</p>}
->
-  {children}
-</LonaQProvider>
-```
-
-#### `useLonaQ()`
-
-データベースインスタンスを取得します（mutations 用）。
-
-#### `useQuery<T>(sql, params?)`
-
-リアクティブな SELECT クエリ。データ変更時に自動で再取得されます。
-
-```typescript
-const { data, isLoading, error, refetch } = useQuery<Todo>(
-  'SELECT * FROM todos WHERE completed = ?',
-  [0]
-);
-```
-
-### 複数タブ対応
-
-lona-q はリーダー選出パターンで複数タブに対応しています。
-
-- 最初に開いたタブが**リーダー**になり、SQLite を直接操作
-- 後から開いたタブは**フォロワー**として、リーダー経由でクエリを実行
-- リーダーが閉じられると、フォロワーが自動的に新リーダーに昇格
-- テーブル変更は全タブにリアルタイムで通知
-
-特別な設定は不要で、`createDB()` を呼ぶだけで動作します。
-
-### Vercel / Next.js にデプロイ
-
-特別な設定は不要です。`bun run build` して Vercel にデプロイするだけ。
-
-**注意**: lona-q はクライアントサイドのみで動作します。Server Components では使えません。`'use client'` ディレクティブが必要です。
-
-### FAQ
-
-**Q: ブラウザを閉じたらデータ消えますか？**
-A: 消えません。OPFS に永続保存されます。
-
-**Q: 他のブラウザやデバイスでデータ共有できますか？**
-A: エクスポート/インポートで可能です。
-
-**Q: どのくらいのデータ量を扱えますか？**
-A: ブラウザのストレージクォータ依存です（通常ディスクの数十%）。
-
-**Q: Next.js の SSR で使えますか？**
-A: クライアントサイドのみです。`'use client'` が必要です。
-
-**Q: 複数タブで開くとどうなりますか？**
-A: リーダー選出パターンで安全に動作します。データの競合は起きません。
-
-### ブラウザサポート
-
-- Chrome 102+
-- Firefox 111+
-- Safari 17+
-- Edge 102+
-
-### ライセンス
 
 MIT
