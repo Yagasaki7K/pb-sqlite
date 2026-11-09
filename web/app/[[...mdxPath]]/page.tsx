@@ -1,6 +1,6 @@
 import { generateStaticParamsFor, importPage } from 'nextra/pages';
 import { useMDXComponents as getMDXComponents } from '../mdx-components';
-import type { ComponentType, ReactNode } from 'react';
+import { createElement, type ReactNode } from 'react';
 
 type PageWrapperProps = {
   children: ReactNode;
@@ -8,6 +8,10 @@ type PageWrapperProps = {
   metadata: unknown;
   sourceCode?: string;
 };
+
+type MdxComponent = (props: { params: { mdxPath?: string[] } }) => ReactNode;
+type PageWrapper = (props: PageWrapperProps) => ReactNode;
+type UntypedCreateElement = (type: unknown, props: Record<string, unknown>) => ReactNode;
 
 export const generateStaticParams = generateStaticParamsFor('mdxPath');
 
@@ -21,10 +25,9 @@ export default async function Page({ params }: { params: Promise<{ mdxPath?: str
   const resolvedParams = await params;
   const result = await importPage(resolvedParams.mdxPath ?? []);
   const { default: MDXContent, toc, metadata, sourceCode } = result;
-  const Wrapper = getMDXComponents().wrapper as unknown as ComponentType<PageWrapperProps>;
-  return (
-    <Wrapper toc={toc} metadata={metadata} sourceCode={sourceCode}>
-      <MDXContent params={resolvedParams} />
-    </Wrapper>
-  );
+  const Wrapper = getMDXComponents().wrapper as unknown as PageWrapper;
+  const Content = MDXContent as unknown as MdxComponent;
+  const createElementUntyped = createElement as unknown as UntypedCreateElement;
+  const content = createElementUntyped(Content, { params: resolvedParams });
+  return createElementUntyped(Wrapper, { toc, metadata, sourceCode, children: content });
 }

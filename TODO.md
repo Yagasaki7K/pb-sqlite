@@ -1,334 +1,405 @@
 ## Melhorias necessárias para o PBDB — Roadmap de lançamento 1.0
 
-### 1. Núcleo do banco de dados
+# PBDB — Roadmap revisado para lançamento 1.0
 
-1. Implementar suporte completo a `PRAGMA` do SQLite.
-2. Implementar gerenciamento de conexões e ciclo de vida do banco.
-3. Implementar suporte a múltiplas instâncias de bancos independentes.
-4. Implementar modo `readOnly` para conexões somente de leitura.
-5. Implementar suporte a `ATTACH DATABASE` e `DETACH DATABASE`.
-6. Implementar suporte completo a prepared statements.
-7. Implementar gerenciamento automático de statements e liberação de memória.
-8. Implementar suporte a savepoints e transações aninhadas.
-9. Implementar execução atômica de múltiplas consultas com `batch()`.
-10. Implementar suporte a consultas com `RETURNING`.
-11. Implementar suporte a BLOBs, Uint8Array, ArrayBuffer e demais tipos nativos do SQLite.
-12. Implementar configuração de `busy_timeout`.
-13. Implementar configuração de `foreign_keys`.
-14. Implementar configuração de journal mode e synchronous.
-15. Implementar verificação de integridade utilizando `PRAGMA integrity_check`.
-16. Implementar verificação de chaves estrangeiras utilizando `PRAGMA foreign_key_check`.
-17. Implementar suporte a SQLite extensions quando tecnicamente compatível com a compilação WASM.
-18. Implementar uma API de introspecção para consultar tabelas, índices, views, triggers e schemas.
-19. Implementar tratamento padronizado de erros SQLite, preservando códigos e mensagens originais.
-20. Implementar cancelamento de consultas de longa duração.
+Após analisar os requisitos e confrontá-los com a proposta e a implementação atual do repositório, minha conclusão é que a maior parte da direção técnica faz sentido, mas o roadmap original está superdimensionado para a versão 1.0.
 
-### 2. OPFS e persistência
+O PBDB tem uma proposta bem definida:
 
-21. Implementar detecção automática de suporte a OPFS.
-22. Implementar estratégia de fallback quando OPFS não estiver disponível.
-23. Implementar recuperação automática após falhas de inicialização do OPFS.
-24. Implementar tratamento de corrupção do arquivo SQLite.
-25. Implementar recuperação de conexões interrompidas.
-26. Implementar gerenciamento de locks entre abas.
-27. Garantir que nunca existam dois líderes operando simultaneamente o mesmo banco.
-28. Implementar detecção de líderes inativos e recuperação de liderança.
-29. Implementar tratamento de encerramento inesperado do Web Worker.
-30. Implementar recuperação de operações interrompidas durante o failover.
-31. Implementar sincronização consistente de mensagens entre líder e seguidores.
-32. Implementar identificação única de requisições para evitar execução duplicada após reconexões.
-33. Implementar controle de timeout para requisições entre abas.
-34. Implementar detecção de quota disponível utilizando Storage API.
-35. Implementar tratamento de `QuotaExceededError`.
-36. Implementar integração com `navigator.storage.persist()`.
-37. Implementar API para consultar o espaço utilizado pelo banco.
-38. Implementar API para excluir bancos e liberar recursos do OPFS.
-39. Implementar testes de persistência após fechamento e reabertura do navegador.
-40. Implementar testes de concorrência com múltiplas abas e múltiplas conexões.
+- Banco de dados SQLite executado diretamente no navegador.
+- Persistência local utilizando OPFS.
+- SQLite compilado em WebAssembly por meio do `wa-sqlite`.
+- Execução isolada em Web Workers.
+- Coordenação de múltiplas abas.
+- API assíncrona para JavaScript/TypeScript.
+- Integração com React.
+- Migrations.
+- Exportação e importação de bancos.
+- Funcionamento offline e sem infraestrutura de backend.
 
-### 3. API e experiência de desenvolvimento
+Consultei também o README, o `package.json` e os módulos principais do código-fonte.
 
-41. Implementar uma API SQL utilizando Tagged Template Literals, com parâmetros automaticamente vinculados.
-42. Implementar `batch()` para execução de múltiplas consultas em uma única transação.
-43. Implementar `reactiveQuery()` para consultas reativas.
-44. Implementar sistema de subscriptions para acompanhar alterações nas tabelas.
-45. Implementar notificações de alterações entre abas.
-46. Implementar suporte a callbacks `onInit`.
-47. Implementar suporte a callbacks `onConnect`.
-48. Implementar suporte a callbacks `onClose`.
-49. Implementar configuração `verbose` para depuração.
-50. Implementar configuração `debug` para diagnóstico.
-51. Implementar configuração `readOnly`.
-52. Implementar configuração `databasePath`.
-53. Implementar uma API de eventos para conexão, desconexão, erro, recuperação e failover.
-54. Implementar suporte a operações assíncronas com cancelamento.
-55. Implementar métodos `deleteDatabase()` e `overwriteDatabaseFile()`.
-56. Implementar documentação e contratos TypeScript para todas as APIs públicas.
-57. Implementar validação dos parâmetros recebidos pelas APIs.
-58. Implementar compatibilidade consistente entre ESM e CommonJS.
+Alguns problemas importantes encontrados na implementação atual:
 
-### 4. React e Next.js
+1. O `createDB()` exige OPFS e não possui fallback real para armazenamento alternativo.
+2. O fallback quando Web Locks não está disponível cria Workers independentes, não garantindo a coordenação entre abas.
+3. A recuperação de falhas do OPFS pode apagar automaticamente o diretório do banco, colocando dados existentes em risco.
+4. O `importSQLite()` apaga o armazenamento antes de validar e restaurar o arquivo, sem restauração atômica.
+5. O método `purgeSynced()` possui uma referência fixa à tabela `vendas`, que não pertence à responsabilidade de uma biblioteca genérica.
+6. O gerenciamento de encerramento e recuperação do líder precisa de melhorias.
+7. A documentação apresenta inconsistências de nomenclatura e ainda contém referências a LonaQ.
 
-59. Implementar integração oficial com React 18 e React 19.
-60. Implementar um Provider com gerenciamento correto do ciclo de vida.
-61. Implementar `useDatabase()`.
-62. Implementar `useQuery()` com atualização automática.
-63. Implementar `useMutation()` para operações de escrita.
-64. Implementar `useReactiveQuery()` para subscriptions.
-65. Implementar `useTransaction()` para operações transacionais.
-66. Implementar `useDatabaseStatus()` para monitoramento da conexão.
-67. Implementar `useDatabaseReady()` para identificar quando o banco está disponível.
-68. Implementar estados padronizados de loading, error e success.
-69. Implementar tratamento de desmontagem de componentes durante consultas.
-70. Implementar prevenção de atualizações desnecessárias de componentes.
-71. Implementar suporte a React Strict Mode.
-72. Garantir compatibilidade com Next.js App Router.
-73. Garantir compatibilidade com Next.js Pages Router.
-74. Implementar exemplos de utilização com Server Components e Client Components, respeitando as limitações de execução no navegador.
-75. Garantir que imports do pacote não executem APIs exclusivas do navegador durante SSR.
-76. Garantir funcionamento em builds de produção da Vercel.
-77. Implementar testes E2E com aplicações Next.js reais.
+Esses pontos são mais importantes para o lançamento do que adicionar dezenas de integrações e funcionalidades secundárias.
 
-### 5. Integração com ORMs e ferramentas
+## 1. Núcleo do banco de dados
 
-78. Implementar integração oficial com Drizzle ORM.
-79. Implementar integração oficial com Kysely.
-80. Criar adaptadores independentes para cada ORM.
-81. Garantir inferência correta de tipos nas consultas.
-82. Implementar suporte a migrations dos ORMs integrados.
-83. Implementar exemplos de CRUD utilizando Drizzle.
-84. Implementar exemplos de CRUD utilizando Kysely.
-85. Garantir que as integrações não introduzam dependências obrigatórias desnecessárias.
-86. Criar exports independentes para cada integração.
+- Implementar gerenciamento completo do ciclo de vida das conexões SQLite.
+- Implementar suporte a múltiplas instâncias de bancos independentes.
+- Implementar gerenciamento seguro de abertura e fechamento de conexões.
+- Implementar suporte a prepared statements.
+- Implementar gerenciamento automático de statements e liberação de memória.
+- Implementar suporte a transações SQLite.
+- Implementar suporte a savepoints e transações aninhadas.
+- Implementar execução atômica de múltiplas consultas com `batch()`.
+- Implementar suporte a consultas com `RETURNING`.
+- Implementar suporte a BLOBs, Uint8Array, ArrayBuffer, bigint e demais tipos compatíveis com SQLite.
+- Implementar suporte a `ATTACH DATABASE` e `DETACH DATABASE`.
+- Implementar suporte a consultas `PRAGMA` por meio da API SQL.
+- Implementar configurações de `busy_timeout` e `foreign_keys`.
+- Implementar configurações de journal mode e synchronous, respeitando as limitações do VFS utilizado.
+- Implementar verificações de integridade utilizando `PRAGMA integrity_check`.
+- Implementar verificações de chaves estrangeiras utilizando `PRAGMA foreign_key_check`.
+- Implementar API de introspecção para consultar tabelas, índices, views, triggers e schemas.
+- Implementar tratamento padronizado de erros SQLite, preservando códigos e mensagens originais.
+- Implementar cancelamento de consultas de longa duração.
+- Implementar modo `readOnly` para conexões somente de leitura.
 
-### 6. Migrations e gerenciamento de schemas
+## 2. OPFS e persistência
 
-87. Implementar sistema de migrations versionadas.
-88. Implementar controle de migrations aplicadas no próprio banco.
-89. Implementar execução automática de migrations pendentes.
-90. Implementar transações durante a execução de migrations.
-91. Implementar rollback de migrations.
-92. Implementar validação da sequência de migrations.
-93. Implementar prevenção de execução duplicada.
-94. Implementar tratamento de falhas durante migrations.
-95. Implementar migrations com suporte a múltiplos arquivos.
-96. Implementar API para consultar o histórico de migrations.
-97. Implementar documentação sobre estratégias de atualização de schemas.
+- Implementar detecção automática de suporte a OPFS.
+- Implementar estratégia de fallback para armazenamento alternativo quando OPFS não estiver disponível.
+- Implementar seleção configurável da estratégia de armazenamento.
+- Implementar recuperação segura após falhas de inicialização do OPFS.
+- Implementar tratamento de corrupção do arquivo SQLite sem apagar automaticamente os dados existentes.
+- Implementar recuperação de conexões interrompidas.
+- Implementar gerenciamento de locks entre abas.
+- Garantir que nunca existam dois líderes operando simultaneamente o mesmo banco.
+- Implementar detecção de líderes inativos.
+- Implementar recuperação automática de liderança após encerramento inesperado do líder.
+- Implementar tratamento de encerramento inesperado do Web Worker.
+- Implementar recuperação de operações interrompidas durante o failover.
+- Implementar sincronização consistente de mensagens entre líder e seguidores.
+- Implementar identificação única de requisições para evitar execução duplicada após reconexões.
+- Implementar controle de timeout para requisições entre abas.
+- Implementar tratamento de `QuotaExceededError`.
+- Implementar detecção de quota disponível utilizando Storage API.
+- Implementar integração com `navigator.storage.persist()`.
+- Implementar API para consultar o espaço utilizado pelo banco.
+- Implementar API para excluir bancos e liberar recursos do OPFS.
+- Implementar testes de persistência após fechamento e reabertura do navegador.
+- Implementar testes de concorrência com múltiplas abas e múltiplas conexões.
 
-### 7. Exportação, importação e backup
+## 3. API e experiência de desenvolvimento
 
-98. Garantir que `exportSQLite()` produza um arquivo SQLite binário válido.
-99. Implementar `importSQLite()` com validação do arquivo recebido.
-100.  Implementar validação do cabeçalho SQLite.
-101.  Implementar validação de integridade antes da restauração.
-102.  Implementar exportação por `Blob`, `File` e `Uint8Array`.
-103.  Implementar importação por `File`, `Blob`, `ArrayBuffer` e `Uint8Array`.
-104.  Implementar suporte a arquivos `.sqlite`, `.sqlite3` e `.db`.
-105.  Implementar substituição segura de bancos existentes.
-106.  Implementar backup sem interromper operações normais.
-107.  Implementar restauração atômica.
-108.  Implementar proteção contra importação de arquivos inválidos.
-109.  Implementar testes com bancos SQLite externos, criados pelo SQLite convencional.
-110.  Implementar testes de round-trip entre exportação e importação.
-111.  Implementar exemplos de download e upload de arquivos SQLite pelo navegador.
+- Padronizar a API pública do PBDB para JavaScript e TypeScript.
+- Implementar uma API SQL utilizando Tagged Template Literals, com parâmetros automaticamente vinculados.
+- Implementar `batch()` para execução de múltiplas consultas em uma única transação.
+- Implementar `reactiveQuery()` independente de frameworks.
+- Implementar sistema de subscriptions para acompanhar alterações nas tabelas.
+- Implementar notificações de alterações entre abas.
+- Implementar callbacks `onInit`, `onConnect` e `onClose`.
+- Implementar configuração `verbose` para depuração.
+- Implementar configuração `debug` para diagnóstico.
+- Implementar configuração `readOnly`.
+- Implementar configuração `databasePath`.
+- Implementar API de eventos para conexão, desconexão, erro, recuperação e failover.
+- Implementar suporte a operações assíncronas com cancelamento.
+- Implementar métodos `deleteDatabase()` e `overwriteDatabaseFile()`.
+- Implementar validação dos parâmetros recebidos pelas APIs.
+- Implementar documentação e contratos TypeScript para todas as APIs públicas.
+- Garantir compatibilidade consistente entre ESM e CommonJS.
 
-### 8. Offline-first e confiabilidade
+## 4. React e Next.js
 
-112. Implementar comportamento consistente quando o dispositivo ficar offline.
-113. Garantir que operações locais não dependam de conexão com servidores externos.
-114. Implementar persistência após reinicialização do navegador.
-115. Implementar recuperação após encerramento inesperado da aplicação.
-116. Implementar monitoramento de disponibilidade do armazenamento.
-117. Implementar proteção contra perda de dados durante atualizações.
-118. Implementar mecanismo de recuperação após falhas do Worker.
-119. Implementar testes de funcionamento em modo avião.
-120. Implementar testes com armazenamento limitado.
-121. Implementar testes com diferentes políticas de limpeza de armazenamento dos navegadores.
-122. Documentar que OPFS pertence à origem e ao perfil do navegador, não à conta do usuário.
-123. Documentar que exportação/importação não representa sincronização automática entre dispositivos.
+- Implementar integração oficial com React 18 e React 19.
+- Implementar Provider com gerenciamento correto do ciclo de vida do banco.
+- Implementar `useDatabase()` como hook de acesso à instância.
+- Implementar `useQuery()` com atualização automática.
+- Implementar `useMutation()` para operações de escrita.
+- Implementar `useReactiveQuery()` para subscriptions.
+- Implementar `useTransaction()` para operações transacionais.
+- Implementar `useDatabaseStatus()` para monitoramento da conexão.
+- Implementar `useDatabaseReady()` para identificar quando o banco está disponível.
+- Implementar estados padronizados de loading, error e success.
+- Implementar tratamento de desmontagem de componentes durante consultas.
+- Implementar prevenção de atualizações desnecessárias de componentes.
+- Garantir compatibilidade com React Strict Mode.
+- Garantir compatibilidade com Next.js App Router.
+- Garantir compatibilidade com Next.js Pages Router.
+- Implementar exemplos com Server Components e Client Components, respeitando as limitações de execução no navegador.
+- Garantir que imports do pacote não executem APIs exclusivas do navegador durante SSR.
+- Garantir funcionamento em builds de produção da Vercel.
+- Implementar testes E2E com aplicações Next.js reais.
 
-### 9. Segurança
+## 5. Integração com ORMs e ferramentas
 
-124. Implementar isolamento adequado entre bancos de diferentes usuários.
-125. Implementar proteção contra acesso acidental a bancos de outras aplicações.
-126. Implementar validação de nomes e caminhos de bancos.
-127. Garantir parametrização de consultas SQL.
-128. Evitar concatenação insegura de parâmetros SQL.
-129. Implementar tratamento seguro de mensagens entre Workers.
-130. Implementar validação de origem e identificação das mensagens entre abas.
-131. Implementar proteção contra operações simultâneas inconsistentes.
-132. Documentar as limitações de segurança do armazenamento local.
-133. Documentar que os dados armazenados no navegador não possuem criptografia automática.
-134. Implementar testes de isolamento entre diferentes origens e bancos.
+- Criar arquitetura de adaptadores independentes para integrações externas.
+- Implementar integração oficial com Drizzle ORM.
+- Implementar integração oficial com Kysely.
+- Garantir inferência correta de tipos nas consultas integradas.
+- Implementar suporte a migrations dos ORMs integrados.
+- Implementar exemplos de CRUD utilizando Drizzle.
+- Implementar exemplos de CRUD utilizando Kysely.
+- Garantir que integrações não introduzam dependências obrigatórias desnecessárias.
+- Criar exports independentes para cada integração.
 
-### 10. Performance
+## 6. Migrations e gerenciamento de schemas
 
-135. Implementar benchmarks de leitura e escrita.
-136. Implementar benchmarks de consultas complexas com JOINs.
-137. Implementar benchmarks de transações com grandes volumes de registros.
-138. Implementar testes com bancos de 10 MB, 100 MB e 1 GB, respeitando as limitações dos navegadores.
-139. Implementar otimização de transferência de dados entre Worker e aplicação.
-140. Implementar transferência de buffers utilizando Transferable Objects quando aplicável.
-141. Implementar consultas paginadas.
-142. Implementar suporte a processamento de grandes resultados sem bloquear a memória.
-143. Implementar otimização de subscriptions para evitar consultas redundantes.
-144. Implementar monitoramento de memória do Worker.
-145. Implementar benchmarks comparativos com SQLocal.
+- Implementar sistema de migrations versionadas.
+- Implementar controle de migrations aplicadas no próprio banco.
+- Implementar execução automática de migrations pendentes.
+- Implementar transações durante a execução de migrations.
+- Implementar rollback de migrations.
+- Implementar validação da sequência de migrations.
+- Implementar prevenção de execução duplicada.
+- Implementar tratamento de falhas durante migrations.
+- Implementar migrations com suporte a múltiplos arquivos.
+- Implementar API para consultar o histórico de migrations.
+- Implementar validação de integridade das migrations por checksum.
+- Implementar documentação sobre estratégias de atualização de schemas.
 
-### 11. Testes e qualidade
+## 7. Exportação, importação e backup
 
-146. Implementar cobertura de testes unitários para todas as APIs públicas.
-147. Implementar testes de integração com SQLite real.
-148. Implementar testes E2E em Chromium.
-149. Implementar testes E2E em Firefox.
-150. Implementar testes E2E em WebKit.
-151. Implementar testes de persistência OPFS.
-152. Implementar testes de failover entre duas ou mais abas.
-153. Implementar testes de concorrência durante operações de escrita.
-154. Implementar testes de recuperação após encerramento do Worker.
-155. Implementar testes de exportação e importação de arquivos externos.
-156. Implementar testes de migrations.
-157. Implementar testes de SSR e hidratação do Next.js.
-158. Implementar testes de compatibilidade com React 18 e 19.
-159. Implementar testes de compatibilidade entre diferentes versões de navegadores.
-160. Implementar cobertura mínima obrigatória de 90% para a lógica principal.
-161. Implementar CI automatizada com Bun.
-162. Implementar validação de TypeScript, ESLint, testes e build em cada Pull Request.
-163. Implementar testes de instalação do pacote publicado, não apenas do workspace.
-164. Implementar testes de instalação com `bun install --frozen-lockfile`.
+- Garantir que `exportSQLite()` produza um arquivo SQLite binário válido.
+- Implementar `importSQLite()` com validação do arquivo recebido.
+- Implementar validação do cabeçalho SQLite.
+- Implementar validação de integridade antes da restauração.
+- Implementar exportação por Blob, File e Uint8Array.
+- Implementar importação por File, Blob, ArrayBuffer e Uint8Array.
+- Implementar suporte a arquivos `.sqlite`, `.sqlite3` e `.db`.
+- Implementar substituição segura de bancos existentes.
+- Implementar backup sem interromper operações normais, respeitando as limitações do VFS.
+- Implementar restauração atômica.
+- Implementar proteção contra importação de arquivos inválidos.
+- Implementar testes com bancos SQLite externos, criados pelo SQLite convencional.
+- Implementar testes de round-trip entre exportação e importação.
+- Implementar exemplos de download e upload de arquivos SQLite pelo navegador.
+- Documentar a diferença entre exportação SQLite binária e exportação lógica em JSON.
 
-### 12. Documentação e site
+## 8. Offline-first e confiabilidade
 
-167. Criar uma apresentação clara da proposta do PBDB.
-168. Criar seção de funcionalidades com indicadores de implementação.
-169. Criar seção de compatibilidade com navegadores.
-170. Criar seção de requisitos técnicos.
-171. Criar seção de instalação com Bun.
-172. Criar Quick Start com TypeScript.
-173. Criar exemplos completos com React.
-174. Criar exemplos completos com Next.js App Router.
-175. Criar exemplos completos com Next.js Pages Router.
-176. Criar exemplos de utilização com Vercel.
-177. Criar exemplos de aplicações offline-first.
-178. Criar exemplos de exportação e importação SQLite.
-179. Criar exemplos de migrations.
-180. Criar documentação de todas as configurações disponíveis.
-181. Criar documentação de todas as APIs públicas.
-182. Criar documentação de erros e soluções.
-183. Criar guia de troubleshooting.
-184. Criar guia de migração para PBDB.
-185. Criar seção de comparação com alternativas existentes.
-186. Criar seção de arquitetura interna.
-187. Criar seção de limitações conhecidas.
-188. Criar seção de segurança e privacidade.
-189. Criar seção de contribuição.
-190. Corrigir todas as referências residuais a LonaQ e `@lona-up/lona-q`.
-191. Garantir que todos os exemplos utilizem `pbdb` e os exports públicos atuais.
-192. Garantir consistência entre documentação EN e PT-BR.
-193. Garantir que o Nextra 4 utilize corretamente o tema oficial.
-194. Implementar busca funcional na documentação.
-195. Implementar navegação por categorias e versões.
-196. Implementar página de changelog.
-197. Implementar página de roadmap.
-198. Implementar página de status de compatibilidade.
-199. Implementar metadados SEO e Open Graph.
-200. Implementar favicon e identidade visual consistentes com a logo oficial.
+- Implementar comportamento consistente quando o dispositivo ficar offline.
+- Garantir que operações locais não dependam de conexão com servidores externos.
+- Implementar persistência após reinicialização do navegador.
+- Implementar recuperação após encerramento inesperado da aplicação.
+- Implementar monitoramento de disponibilidade do armazenamento.
+- Implementar proteção contra perda de dados durante atualizações.
+- Implementar mecanismo de recuperação após falhas do Worker.
+- Implementar testes de funcionamento em modo avião.
+- Implementar testes com armazenamento limitado.
+- Implementar testes com diferentes políticas de limpeza de armazenamento dos navegadores.
+- Documentar que OPFS pertence à origem e ao perfil do navegador, não à conta do usuário.
+- Documentar que exportação/importação não representa sincronização automática entre dispositivos.
 
-### 13. Estrutura e distribuição do pacote
+## 9. Segurança
 
-201. Revisar os exports definidos no `packages/pbdb/package.json`.
-202. Garantir que todos os arquivos declarados em `exports` sejam efetivamente gerados.
-203. Garantir que os arquivos `.d.ts` sejam publicados corretamente.
-204. Garantir compatibilidade entre importações ESM e CommonJS.
-205. Garantir que o Worker seja disponibilizado corretamente após a publicação.
-206. Validar resolução de caminhos dos arquivos WASM em aplicações Next.js.
-207. Garantir que os arquivos WASM sejam incluídos na distribuição NPM.
-208. Implementar verificação automática do conteúdo do pacote utilizando `npm pack --dry-run`.
-209. Revisar `sideEffects` para garantir que não prejudique a inicialização do Worker.
-210. Implementar testes de instalação em projetos externos.
-211. Implementar versionamento semântico.
-212. Implementar publicação automatizada no NPM.
-213. Implementar GitHub Releases.
-214. Implementar geração automática do changelog.
-215. Implementar documentação de breaking changes.
-216. Garantir que Bun seja o gerenciador oficial em todos os fluxos de desenvolvimento e CI.
+- Implementar isolamento adequado entre bancos independentes.
+- Implementar proteção contra acesso acidental a bancos de outras aplicações.
+- Implementar validação de nomes e caminhos de bancos.
+- Garantir parametrização de consultas SQL.
+- Evitar concatenação insegura de parâmetros SQL.
+- Implementar tratamento seguro de mensagens entre Workers.
+- Implementar validação de origem e identificação das mensagens entre abas.
+- Implementar proteção contra operações simultâneas inconsistentes.
+- Documentar as limitações de segurança do armazenamento local.
+- Documentar que os dados armazenados no navegador não possuem criptografia automática.
+- Implementar testes de isolamento entre diferentes origens e bancos.
 
-### 14. Infraestrutura e lançamento
+## 10. Performance
 
-217. Configurar GitHub Actions para CI.
-218. Configurar matriz de testes para Node.js 20 e 22.
-219. Configurar build automatizado do site Nextra.
-220. Configurar deploy automático da documentação na Vercel.
-221. Implementar validação de build antes de publicar versões.
-222. Implementar verificação de dependências vulneráveis.
-223. Implementar auditoria de licenças das dependências.
-224. Implementar política de suporte a versões.
-225. Criar política de manutenção e descontinuação de APIs.
-226. Criar templates de Issues.
-227. Criar templates de Pull Requests.
-228. Revisar `CONTRIBUTING.md`.
-229. Revisar `CODE_OF_CONDUCT.md`.
-230. Revisar a licença e os créditos de atribuição ao projeto original.
+- Implementar benchmarks de leitura e escrita.
+- Implementar benchmarks de consultas complexas com JOINs.
+- Implementar benchmarks de transações com grandes volumes de registros.
+- Implementar testes com bancos de 10 MB, 100 MB e 1 GB, respeitando as limitações dos navegadores.
+- Implementar otimização de transferência de dados entre Worker e aplicação.
+- Implementar transferência de buffers utilizando Transferable Objects quando aplicável.
+- Implementar consultas paginadas.
+- Implementar suporte a processamento de grandes resultados sem bloquear a memória.
+- Implementar otimização de subscriptions para evitar consultas redundantes.
+- Implementar monitoramento de memória do Worker.
+- Implementar benchmarks comparativos com SQLocal.
 
-## 15. Diferenciais para competir com SQLocal
+## 11. Testes e qualidade
 
-Com base nas funcionalidades documentadas do SQLocal — incluindo Worker, OPFS, consultas reativas, integração com Drizzle e Kysely, transações, batch e gerenciamento de arquivos SQLite — estas são as oportunidades mais relevantes para o PBDB.&#x20;
+- Implementar cobertura de testes unitários para todas as APIs públicas.
+- Implementar testes de integração com SQLite real.
+- Implementar testes E2E em Chromium.
+- Implementar testes E2E em Firefox.
+- Implementar testes E2E em WebKit.
+- Implementar testes de persistência OPFS.
+- Implementar testes de failover entre duas ou mais abas.
+- Implementar testes de concorrência durante operações de escrita.
+- Implementar testes de recuperação após encerramento do Worker.
+- Implementar testes de exportação e importação de arquivos externos.
+- Implementar testes de migrations.
+- Implementar testes de SSR e hidratação do Next.js.
+- Implementar testes de compatibilidade com React 18 e 19.
+- Implementar testes de compatibilidade entre diferentes versões de navegadores.
+- Implementar cobertura mínima obrigatória de 90% para a lógica principal.
+- Implementar CI automatizada com Bun.
+- Implementar validação de TypeScript, ESLint, testes e build em cada Pull Request.
+- Implementar testes de instalação do pacote publicado, não apenas do workspace.
+- Implementar testes de instalação com `bun install --frozen-lockfile`.
 
-[image](https://www.google.com/s2/favicons?domain=https://sqlocal.dev&sz=32)
+## 12. Documentação e site
 
-sqlocal.dev+5
+- Refazer o README.md com apresentação profissional.
+- Utilizar a logo oficial do PBDB.
+- Criar uma apresentação clara da proposta do PBDB.
+- Criar seção de funcionalidades com indicadores de implementação.
+- Criar seção de compatibilidade com navegadores.
+- Criar seção de requisitos técnicos.
+- Criar seção de instalação com Bun.
+- Criar Quick Start com TypeScript.
+- Criar exemplos completos com JavaScript/TypeScript.
+- Criar exemplos completos com React.
+- Criar exemplos completos com Next.js App Router.
+- Criar exemplos completos com Next.js Pages Router.
+- Criar exemplos de utilização com Vercel.
+- Criar exemplos de aplicações offline-first.
+- Criar exemplos de exportação e importação SQLite.
+- Criar exemplos de migrations.
+- Criar documentação de todas as configurações disponíveis.
+- Criar documentação de todas as APIs públicas.
+- Criar documentação de erros e soluções.
+- Criar guia de troubleshooting.
+- Criar guia de migração para PBDB.
+- Criar seção de comparação com alternativas existentes.
+- Criar seção de arquitetura interna.
+- Criar seção de limitações conhecidas.
+- Criar seção de segurança e privacidade.
+- Criar seção de contribuição.
+- Corrigir todas as referências residuais a LonaQ e `@lona-up/lona-q`.
+- Garantir que todos os exemplos utilizem `pbdb` e os exports públicos atuais.
+- Garantir consistência entre documentação EN e PT-BR.
+- Garantir que o Nextra 4 utilize corretamente o tema oficial.
+- Implementar busca funcional na documentação.
+- Implementar navegação por categorias e versões.
+- Implementar página de changelog.
+- Implementar página de roadmap.
+- Implementar página de status de compatibilidade.
+- Implementar metadados SEO e Open Graph.
+- Implementar favicon e identidade visual consistentes com a logo oficial.
 
-231. Implementar uma API SQL Tagged Template nativa.
-232. Implementar integração oficial com Drizzle ORM.
-233. Implementar integração oficial com Kysely.
-234. Implementar sistema de subscriptions reativas independente do React.
-235. Implementar suporte a Vue.
-236. Implementar suporte a Angular.
-237. Implementar integração com outros frameworks sem dependência de React.
-238. Implementar um sistema de migrations mais completo.
-239. Implementar gerenciamento avançado de conexões.
-240. Implementar gerenciamento de múltiplos bancos.
-241. Implementar sistema de backup automático configurável.
-242. Implementar recuperação automática de conexões.
-243. Implementar fallback inteligente de armazenamento.
-244. Implementar API de monitoramento de performance.
-245. Implementar API de diagnóstico do banco.
-246. Implementar API de gerenciamento de arquivos SQLite.
-247. Implementar importação e exportação compatíveis com SQLite convencional.
-248. Implementar suporte a consultas reativas com dependências de tabelas.
-249. Implementar notificações de alterações com granularidade por tabela.
-250. Implementar adaptadores independentes para diferentes estratégias de armazenamento.
+## 13. Estrutura e distribuição do pacote
 
-### 16. Critérios obrigatórios para liberar a versão 1.0
+- Revisar os exports definidos no `packages/pbdb/package.json`.
+- Garantir que todos os arquivos declarados em `exports` sejam efetivamente gerados.
+- Garantir que os arquivos `.d.ts` sejam publicados corretamente.
+- Garantir compatibilidade entre importações ESM e CommonJS.
+- Garantir que o Worker seja disponibilizado corretamente após a publicação.
+- Validar resolução de caminhos dos arquivos WASM em aplicações Next.js.
+- Garantir que os arquivos WASM sejam incluídos na distribuição NPM.
+- Implementar verificação automática do conteúdo do pacote utilizando `npm pack --dry-run`.
+- Revisar `sideEffects` para garantir que não prejudique a inicialização do Worker.
+- Implementar testes de instalação em projetos externos.
+- Implementar versionamento semântico.
+- Implementar publicação automatizada no NPM.
+- Implementar GitHub Releases.
+- Implementar geração automática do changelog.
+- Implementar documentação de breaking changes.
+- Garantir que Bun seja o gerenciador oficial em todos os fluxos de desenvolvimento e CI.
 
-251. Todos os testes unitários devem passar.
-252. Todos os testes E2E devem passar.
-253. O failover real deve funcionar em múltiplas abas.
-254. A persistência OPFS deve sobreviver ao encerramento do navegador.
-255. A exportação deve gerar arquivos SQLite binários válidos.
-256. A importação deve restaurar bancos SQLite externos.
-257. O pacote deve funcionar em projetos Next.js App Router.
-258. O pacote deve funcionar em projetos Next.js Pages Router.
-259. O pacote deve compilar e funcionar em produção na Vercel.
-260. O pacote deve funcionar sem configuração manual de infraestrutura para o cenário padrão suportado.
-261. O pacote deve funcionar offline após sua inicialização.
-262. Todas as APIs públicas devem possuir tipagem TypeScript.
-263. Todos os exports devem estar disponíveis na distribuição NPM.
-264. A documentação deve refletir exatamente a implementação publicada.
-265. Todos os exemplos devem ser executáveis.
-266. O README deve apresentar a identidade oficial do PBDB.
-267. Não devem existir referências incorretas a LonaQ na documentação do produto.
-268. Não devem existir erros de lint.
-269. Não devem existir erros de TypeScript.
-270. O build da biblioteca e da documentação deve passar.
-271. O pacote deve ser testado em uma instalação limpa, fora do monorepo.
-272. Deve existir uma versão de release candidate antes da publicação definitiva.
+## 14. Infraestrutura e lançamento
 
-Referências técnicas:
+- Configurar GitHub Actions para CI.
+- Configurar matriz de testes para Node.js 20 e 22.
+- Configurar build automatizado do site Nextra.
+- Configurar deploy automático da documentação na Vercel.
+- Implementar validação de build antes de publicar versões.
+- Implementar verificação de dependências vulneráveis.
+- Implementar auditoria de licenças das dependências.
+- Implementar política de suporte a versões.
+- Criar política de manutenção e descontinuação de APIs.
+- Criar templates de Issues.
+- Criar templates de Pull Requests.
+- Revisar `CONTRIBUTING.md`.
+- Revisar `CODE_OF_CONDUCT.md`.
+- Revisar a licença e os créditos de atribuição ao projeto original.
 
-- [SQLocal — documentação oficial](https://sqlocal.dev/?utm_source=chatgpt.com).
-- [SQLocal — API SQL](https://sqlocal.dev/api/sql?utm_source=chatgpt.com).
-- [SQLocal — transações](https://sqlocal.dev/api/transaction?utm_source=chatgpt.com).
-- [SQLocal — batch](https://sqlocal.dev/api/batch?utm_source=chatgpt.com).
-- [SQLocal — gerenciamento de arquivos SQLite](https://sqlocal.dev/api/overwritedatabasefile?utm_source=chatgpt.com).
-- [PBDB — repositório](https://github.com/Yagasaki7K/pbdb?utm_source=chatgpt.com).
+## 15. Diferenciais competitivos
+
+- Implementar API SQL Tagged Template nativa.
+- Implementar sistema de subscriptions reativas independente do React.
+- Implementar consultas reativas com identificação de dependências de tabelas.
+- Implementar notificações de alterações com granularidade por tabela.
+- Implementar gerenciamento avançado de conexões.
+- Implementar gerenciamento de múltiplos bancos independentes.
+- Implementar sistema de backup automático configurável.
+- Implementar recuperação automática de conexões.
+- Implementar fallback inteligente de armazenamento.
+- Implementar API de monitoramento de performance.
+- Implementar API de diagnóstico do banco.
+- Implementar API de gerenciamento de arquivos SQLite.
+- Implementar importação e exportação compatíveis com SQLite convencional.
+- Implementar adaptadores independentes para diferentes estratégias de armazenamento.
+- Implementar integrações com frameworks adicionais sem dependência obrigatória de React.
+
+## 16. Critérios obrigatórios para liberar a versão 1.0
+
+- Todos os testes unitários devem passar.
+- Todos os testes de integração devem passar.
+- Todos os testes E2E devem passar.
+- O failover real deve funcionar em múltiplas abas.
+- A persistência OPFS deve sobreviver ao encerramento do navegador.
+- O armazenamento não pode apagar automaticamente bancos existentes durante tentativas de recuperação.
+- A exportação deve gerar arquivos SQLite binários válidos.
+- A importação deve restaurar bancos SQLite externos.
+- A importação deve possuir mecanismo de restauração segura em caso de falha.
+- O pacote deve funcionar em projetos Next.js App Router.
+- O pacote deve funcionar em projetos Next.js Pages Router.
+- O pacote deve compilar e funcionar em produção na Vercel.
+- O pacote deve funcionar sem configuração manual de infraestrutura para o cenário padrão suportado.
+- O pacote deve funcionar offline após sua inicialização.
+- Todas as APIs públicas devem possuir tipagem TypeScript.
+- Todos os exports devem estar disponíveis na distribuição NPM.
+- A documentação deve refletir exatamente a implementação publicada.
+- Todos os exemplos devem ser executáveis.
+- O README deve apresentar a identidade oficial do PBDB.
+- Não devem existir referências incorretas a LonaQ na documentação do produto.
+- Não devem existir erros de lint.
+- Não devem existir erros de TypeScript.
+- O build da biblioteca e da documentação deve passar.
+- O pacote deve ser testado em uma instalação limpa, fora do monorepo.
+- Deve existir uma versão Release Candidate antes da publicação definitiva.
+
+## O que removi do roadmap original
+
+Estas funcionalidades não foram mantidas como requisitos do roadmap principal:
+
+| Funcionalidade                                        | Motivo                                                                                              |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Suporte oficial a Vue                                 | Expansão de ecossistema, não requisito da primeira versão.                                          |
+| Suporte oficial a Angular                             | Expansão de ecossistema, não requisito da primeira versão.                                          |
+| Extensões SQLite                                      | Dependem de compatibilidade e compilação WASM específicas.                                          |
+| Integração obrigatória com ORMs                       | Devem ser adaptadores opcionais.                                                                    |
+| Implementar suporte completo a PRAGMA individualmente | O objetivo deve ser preservar a execução SQL nativa, não recriar funcionalidades do SQLite.         |
+| Sistema próprio de sincronização entre dispositivos   | O PBDB é um banco local, não um serviço de sincronização.                                           |
+| Criptografia automática do banco                      | Não deve ser prometida sem uma estratégia criptográfica definida.                                   |
+| Suporte irrestrito a qualquer tamanho de banco        | Limitado pelo armazenamento e pela memória disponíveis no navegador.                                |
+| Implementar funcionalidades duplicadas                | `batch()`, `readOnly`, exportação e outras apareciam em várias seções.                              |
+| Competir com todos os recursos do SQLocal             | O diferencial deve ser a qualidade da arquitetura, confiabilidade e experiência de desenvolvimento. |
+
+Importante: Drizzle e Kysely foram mantidos como integrações opcionais, não como dependências do núcleo.
+
+## Minha recomendação de prioridades
+
+Eu não tentaria implementar todos os itens simultaneamente. Organizaria o desenvolvimento em quatro etapas:
+
+Fase 1 — Estabilidade do Core
+
+Prioridade máxima
+
+Conexões, Workers, OPFS, failover, segurança, concorrência, recuperação e integridade dos dados.
+
+Fase 2 — API e funcionalidades
+
+Prepared statements, batch, transações, migrations, subscriptions, exportação e importação SQLite.
+
+Fase 3 — Ecossistema
+
+React, Next.js, Drizzle, Kysely, documentação, exemplos e experiência de desenvolvimento.
+
+Fase 4 — Lançamento
+
+Benchmarks, testes de compatibilidade, CI/CD, distribuição NPM, Release Candidate e documentação definitiva.
+
+Uma decisão arquitetural importante: não sacrifique a confiabilidade do OPFS para oferecer suporte indiscriminado a múltiplas conexões. Os VFS disponíveis possuem trade-offs diferentes em concorrência, desempenho e compatibilidade. A arquitetura deve escolher e documentar a estratégia adequada.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://sqlite.org&sz=32)
+
+sqlite.org+1
+
+Minha avaliação final: o PBDB deve competir com o SQLocal pela qualidade de sua abstração, confiabilidade, tipagem, experiência de desenvolvimento e integração com aplicações modernas — não simplesmente pelo número de funcionalidades.
+
+O roadmap acima mantém essa direção e evita transformar a versão 1.0 em um projeto muito maior do que sua proposta original.
