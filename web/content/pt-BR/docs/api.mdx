@@ -6,7 +6,7 @@ title: Referência da API
 
 ## `createDB(nome, opções?)`
 
-Abre um banco no navegador e retorna um `PbdbDatabase`.
+Abre um banco no navegador e retorna um `PbSqliteDatabase`.
 
 ```ts
 const db = await createDB('catalogo', {
@@ -24,7 +24,7 @@ const produtos = await db.query<Produto>('SELECT * FROM produtos WHERE estoque >
 const produto = await db.getOne<Produto>('SELECT * FROM produtos WHERE id = ?', [productId]);
 ```
 
-`run` executa comandos sem resultado de linhas. `query` retorna `T[]`; `getOne` retorna `T | null`.
+`exec` executa DDL sem parâmetros. `run` executa DML; `query` retorna `T[]`; `getOne` retorna `T | null`.
 
 ## Transações
 
@@ -36,6 +36,8 @@ await db.transaction(async (tx) => {
 ```
 
 A transação confirma quando o callback termina e desfaz as alterações quando ele lança um erro.
+
+Os erros tipados incluem `PbSqliteError`, `PbSqliteNotReadyError`, `PbSqliteTimeoutError`, `PbSqliteQueryError`, `WorkerCrashedError`, `OPFSUnavailableError` e `QuotaExceededError`.
 
 ## Ciclo de vida e dados
 

@@ -20,6 +20,6 @@ const migrations: Migration[] = [{
 await db.migrate(migrations);
 ```
 
-Migrations are sorted by version and recorded in `_pbdb_migrations`. The checksum is derived from version, name, and `up` SQL when empty. Once applied, changing a migration is an error; add a new version instead.
+Migrations are sorted by version and recorded in `_pbsqlite_migrations`. The checksum is derived from version, name, and `up` SQL when empty. Once applied, changing a migration is an error; add a new version instead.
 
 `rollback(targetVersion, migrations)` runs declared `down` SQL in reverse order. A migration without `down` cannot be rolled back safely.

@@ -14,6 +14,7 @@ const englishTopics: Topic[] = [
   { href: '/docs/api', label: 'API reference' },
   { href: '/docs/react', label: 'React integration' },
   { href: '/docs/nextjs', label: 'Next.js' },
+  { href: '/docs/browser-support', label: 'Browser support' },
   { href: '/docs/storage', label: 'Storage & durability' },
   { href: '/docs/multi-tab', label: 'Multi-tab sync' },
   { href: '/docs/migrations', label: 'Migrations' },

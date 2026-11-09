@@ -1,0 +1,22 @@
+---
+title: Browser support
+description: Runtime requirements for OPFS, Web Workers, Web Locks, and BroadcastChannel.
+---
+
+# Browser support
+
+`pb-sqlite` runs in a browser context. It requires Origin Private File System (OPFS) and Web Workers; it does not silently fall back to IndexedDB.
+
+| Capability | Required | Used for |
+| --- | --- | --- |
+| OPFS (`navigator.storage.getDirectory`) | Yes | SQLite file persistence |
+| Web Worker | Yes | Running `wa-sqlite` off the main thread |
+| `BroadcastChannel` | Yes for multi-tab coordination | Change notifications and request routing |
+| Web Locks | Recommended | Leader election and failover between tabs |
+| `navigator.storage.persist` | Optional | Requesting durable storage permission |
+
+## Framework boundaries
+
+Initialize the database only in browser code. In Next.js, use a Client Component or an effect; do not call `createDB` in a Server Component, during static generation, or in a Node.js process.
+
+If Web Locks is unavailable, the library remains usable in single-tab mode. OPFS and Web Worker support are not optional.

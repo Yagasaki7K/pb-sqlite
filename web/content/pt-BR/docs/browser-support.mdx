@@ -1,0 +1,22 @@
+---
+title: Suporte de navegadores
+description: Requisitos de OPFS, Web Workers, Web Locks e BroadcastChannel.
+---
+
+# Suporte de navegadores
+
+O `pb-sqlite` roda no contexto do navegador. Ele exige OPFS e Web Workers; não há fallback silencioso para IndexedDB.
+
+| Capacidade | Obrigatória | Uso |
+| --- | --- | --- |
+| OPFS (`navigator.storage.getDirectory`) | Sim | Persistência dos arquivos SQLite |
+| Web Worker | Sim | Executar `wa-sqlite` fora da thread principal |
+| `BroadcastChannel` | Sim para múltiplas abas | Notificações e roteamento de requisições |
+| Web Locks | Recomendada | Eleição e failover entre abas |
+| `navigator.storage.persist` | Opcional | Solicitar armazenamento durável |
+
+## Limites de frameworks
+
+Inicialize o banco apenas em código do navegador. No Next.js, use um Client Component ou um effect; não chame `createDB` em Server Components, durante geração estática ou em um processo Node.js.
+
+Sem Web Locks, a biblioteca continua utilizável em uma única aba. OPFS e Web Worker não são opcionais.
