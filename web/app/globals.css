@@ -35,10 +35,12 @@ a { color: var(--accent); text-decoration: none; }
 .docs-content :not(pre) > code { color: var(--dracula-pink); background: #1d1f29; border: 1px solid #44475a; border-radius: .35rem; padding: .12rem .35rem; }
 .docs-content pre { overflow: auto; padding: 1.15rem 1.25rem; border: 1px solid #44475a; border-radius: .75rem; background: var(--dracula-bg) !important; color: var(--dracula-fg) !important; box-shadow: 0 .5rem 1.5rem rgb(0 0 0 / 20%); }
 .docs-content pre code { color: var(--dracula-fg) !important; background: transparent !important; border: 0; padding: 0; }
-.docs-content pre .comment, .docs-content pre [class*="comment"] { color: var(--dracula-comment); }
-.docs-content pre .keyword, .docs-content pre [class*="keyword"] { color: var(--dracula-pink); }
-.docs-content pre .string, .docs-content pre [class*="string"] { color: var(--dracula-yellow); }
-.docs-content pre .function, .docs-content pre [class*="function"] { color: var(--dracula-green); }
-.docs-content pre .number, .docs-content pre [class*="number"] { color: var(--dracula-purple); }
+.docs-content pre code span { color: var(--dracula-fg) !important; }
+.docs-content pre .comment, .docs-content pre [class*="comment"] { color: var(--dracula-comment) !important; }
+.docs-content pre .keyword, .docs-content pre [class*="keyword"], .docs-content pre [class*="keyword"] span { color: var(--dracula-pink) !important; }
+.docs-content pre .string, .docs-content pre [class*="string"], .docs-content pre [class*="string"] span { color: var(--dracula-yellow) !important; }
+.docs-content pre .function, .docs-content pre [class*="function"], .docs-content pre [class*="function"] span { color: var(--dracula-green) !important; }
+.docs-content pre .number, .docs-content pre [class*="number"], .docs-content pre [class*="number"] span { color: var(--dracula-purple) !important; }
+.docs-content pre .built_in, .docs-content pre [class*="builtin"], .docs-content pre [class*="built-in"] { color: var(--dracula-cyan) !important; }
 @media (max-width: 800px) { .docs-header { flex-wrap: wrap; } .top-nav { order: 3; width: 100%; } .docs-layout { display: block; } .docs-sidebar { padding: 1rem 1.5rem; border-right: 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); overflow-x: auto; } .docs-sidebar nav { display: flex; gap: .25rem; width: max-content; } .docs-content { padding-top: 2rem; } }
 @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } main { padding-top: 2rem; } }
