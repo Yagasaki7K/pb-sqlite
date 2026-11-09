@@ -9,11 +9,12 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<'/'>) {
+  const pageMap = await getPageMap();
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <Layout>
-          <Navbar pageMap={await getPageMap()} logo={<strong>🐻‍❄️ pbdb</strong>} />
+        <Layout pageMap={pageMap}>
+          <Navbar pageMap={pageMap} logo={<strong>🐻‍❄️ pbdb</strong>} />
           {children}
           <Footer>pbdb — Polar Bear Database</Footer>
         </Layout>
