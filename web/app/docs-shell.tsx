@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 type Topic = { href: string; label: string };
 
 const englishTopics: Topic[] = [
-  { href: '/docs', label: 'Overview' },
+  { href: '/', label: 'Overview' },
   { href: '/docs/getting-started', label: 'Getting started' },
   { href: '/docs/concepts', label: 'Core concepts' },
   { href: '/docs/use-cases', label: 'Use cases' },
@@ -25,7 +25,7 @@ const englishTopics: Topic[] = [
 ];
 
 const portugueseLabels: Record<string, string> = {
-  '/docs': 'Visão geral', '/docs/getting-started': 'Primeiros passos', '/docs/concepts': 'Conceitos principais',
+  '/': 'Visão geral', '/docs/getting-started': 'Primeiros passos', '/docs/concepts': 'Conceitos principais',
   '/docs/use-cases': 'Casos de uso', '/docs/api': 'Referência da API', '/docs/react': 'Integração com React',
   '/docs/nextjs': 'Next.js', '/docs/storage': 'Armazenamento e durabilidade', '/docs/multi-tab': 'Sincronização entre abas',
   '/docs/browser-support': 'Suporte de navegadores',
@@ -36,7 +36,7 @@ const portugueseLabels: Record<string, string> = {
 export function DocsShell({ children }: Readonly<{ children: ReactNode }>) {
   const pathname = usePathname() ?? '/';
   const isPortuguese = pathname.startsWith('/pt-BR');
-  const currentPath = isPortuguese ? pathname.replace(/^\/pt-BR/, '') || '/docs' : pathname;
+  const currentPath = isPortuguese ? pathname.replace(/^\/pt-BR/, '') || '/' : pathname;
   const topics = isPortuguese
     ? englishTopics.map((topic) => ({ ...topic, href: `/pt-BR${topic.href}`, label: portugueseLabels[topic.href] }))
     : englishTopics;
@@ -45,9 +45,9 @@ export function DocsShell({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <div className="docs-shell">
       <header className="docs-header">
-        <Link className="brand" href={isPortuguese ? '/pt-BR/docs' : '/docs'}>❄️ Polarbear Database</Link>
+        <Link className="brand" href={isPortuguese ? '/pt-BR/' : '/'}>❄️ Polarbear Database</Link>
         <nav aria-label="Primary navigation" className="top-nav">
-          <Link href={isPortuguese ? '/pt-BR/docs' : '/docs'}>{isPortuguese ? 'Documentação' : 'Docs'}</Link>
+          <Link href={isPortuguese ? '/pt-BR/' : '/'}>{isPortuguese ? 'Documentação' : 'Docs'}</Link>
           <Link href="/translate">{isPortuguese ? 'Traduções' : 'Translations'}</Link>
         </nav>
         <details className="language-menu">
